@@ -1,0 +1,71 @@
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.AssemblyReference.cache
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.GeneratedMSBuildEditorConfig.editorconfig
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfoInputs.cache
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfo.cs
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.CoreCompileInputs.cache
+G:\graduation project implementation\ServiceLayer\bin\Debug\net8.0\ServiceLayer.deps.json
+G:\graduation project implementation\ServiceLayer\bin\Debug\net8.0\ServiceLayer.runtimeconfig.json
+G:\graduation project implementation\ServiceLayer\bin\Debug\net8.0\ServiceLayer.dll
+G:\graduation project implementation\ServiceLayer\bin\Debug\net8.0\ServiceLayer.pdb
+G:\graduation project implementation\ServiceLayer\bin\Debug\net8.0\DomainLayer.dll
+G:\graduation project implementation\ServiceLayer\bin\Debug\net8.0\DomainLayer.pdb
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceL.3037F684.Up2Date
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.dll
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\refint\ServiceLayer.dll
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.pdb
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ServiceLayer.genruntimeconfig.cache
+G:\graduation project implementation\ServiceLayer\obj\Debug\net8.0\ref\ServiceLayer.dll
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.AssemblyReference.cache
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.GeneratedMSBuildEditorConfig.editorconfig
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfoInputs.cache
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfo.cs
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.CoreCompileInputs.cache
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.sourcelink.json
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.dll
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\refint\ServiceLayer.dll
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.pdb
+D:\Collage\8th\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.deps.json
+D:\Collage\8th\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.runtimeconfig.json
+D:\Collage\8th\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.dll
+D:\Collage\8th\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.pdb
+D:\Collage\8th\GearCare-API\ServiceLayer\bin\Debug\net8.0\DomainLayer.dll
+D:\Collage\8th\GearCare-API\ServiceLayer\bin\Debug\net8.0\DomainLayer.pdb
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceL.3037F684.Up2Date
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.genruntimeconfig.cache
+D:\Collage\8th\GearCare-API\ServiceLayer\obj\Debug\net8.0\ref\ServiceLayer.dll
+D:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.deps.json
+D:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.runtimeconfig.json
+D:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.dll
+D:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.pdb
+D:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\DomainLayer.dll
+D:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\DomainLayer.pdb
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.AssemblyReference.cache
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.GeneratedMSBuildEditorConfig.editorconfig
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfoInputs.cache
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfo.cs
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.CoreCompileInputs.cache
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.sourcelink.json
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceL.3037F684.Up2Date
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.dll
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\refint\ServiceLayer.dll
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.pdb
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.genruntimeconfig.cache
+D:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ref\ServiceLayer.dll
+E:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.deps.json
+E:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.runtimeconfig.json
+E:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.dll
+E:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\ServiceLayer.pdb
+E:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\DomainLayer.dll
+E:\GearCare-API\GearCare-API\ServiceLayer\bin\Debug\net8.0\DomainLayer.pdb
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.AssemblyReference.cache
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.GeneratedMSBuildEditorConfig.editorconfig
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfoInputs.cache
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfo.cs
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.CoreCompileInputs.cache
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.sourcelink.json
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceL.3037F684.Up2Date
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.dll
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\refint\ServiceLayer.dll
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.pdb
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ServiceLayer.genruntimeconfig.cache
+E:\GearCare-API\GearCare-API\ServiceLayer\obj\Debug\net8.0\ref\ServiceLayer.dll
