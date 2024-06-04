@@ -1,0 +1,6 @@
+@GearCareAPI_HostAddress = http://localhost:5173
+
+GET {{GearCareAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

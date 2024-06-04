@@ -1,0 +1,6 @@
+@RepositoryLayer_HostAddress = http://localhost:5086
+
+GET {{RepositoryLayer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

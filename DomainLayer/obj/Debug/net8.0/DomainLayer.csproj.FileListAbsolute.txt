@@ -1,0 +1,59 @@
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.AssemblyReference.cache
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.GeneratedMSBuildEditorConfig.editorconfig
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfoInputs.cache
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfo.cs
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.CoreCompileInputs.cache
+G:\graduation project implementation\DomainLayer\bin\Debug\net8.0\DomainLayer.deps.json
+G:\graduation project implementation\DomainLayer\bin\Debug\net8.0\DomainLayer.runtimeconfig.json
+G:\graduation project implementation\DomainLayer\bin\Debug\net8.0\DomainLayer.dll
+G:\graduation project implementation\DomainLayer\bin\Debug\net8.0\DomainLayer.pdb
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.dll
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\refint\DomainLayer.dll
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.pdb
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\DomainLayer.genruntimeconfig.cache
+G:\graduation project implementation\DomainLayer\obj\Debug\net8.0\ref\DomainLayer.dll
+D:\Collage\8th\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.deps.json
+D:\Collage\8th\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.runtimeconfig.json
+D:\Collage\8th\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.dll
+D:\Collage\8th\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.pdb
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.AssemblyReference.cache
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.GeneratedMSBuildEditorConfig.editorconfig
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfoInputs.cache
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfo.cs
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.CoreCompileInputs.cache
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.sourcelink.json
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.dll
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\refint\DomainLayer.dll
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.pdb
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.genruntimeconfig.cache
+D:\Collage\8th\GearCare-API\DomainLayer\obj\Debug\net8.0\ref\DomainLayer.dll
+D:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.deps.json
+D:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.runtimeconfig.json
+D:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.dll
+D:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.pdb
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.AssemblyReference.cache
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.GeneratedMSBuildEditorConfig.editorconfig
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfoInputs.cache
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfo.cs
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.CoreCompileInputs.cache
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.sourcelink.json
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.dll
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\refint\DomainLayer.dll
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.pdb
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.genruntimeconfig.cache
+D:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\ref\DomainLayer.dll
+E:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.deps.json
+E:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.runtimeconfig.json
+E:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.dll
+E:\GearCare-API\GearCare-API\DomainLayer\bin\Debug\net8.0\DomainLayer.pdb
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.AssemblyReference.cache
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.GeneratedMSBuildEditorConfig.editorconfig
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfoInputs.cache
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.AssemblyInfo.cs
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.csproj.CoreCompileInputs.cache
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.sourcelink.json
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.dll
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\refint\DomainLayer.dll
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.pdb
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\DomainLayer.genruntimeconfig.cache
+E:\GearCare-API\GearCare-API\DomainLayer\obj\Debug\net8.0\ref\DomainLayer.dll
