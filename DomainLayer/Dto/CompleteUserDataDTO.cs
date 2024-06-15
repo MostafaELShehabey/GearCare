@@ -8,9 +8,8 @@ using static DomainLayer.Helpers.Enums;
 
 namespace DomainLayer.Dto
 {
-    public class CompleteUserData
+    public class CompleteUserDataDTO
     {
-
         public string Name { get; set; }
         public string Username { get; set; }
         public string Location { get; set; }

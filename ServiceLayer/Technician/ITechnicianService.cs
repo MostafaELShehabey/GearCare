@@ -7,11 +7,10 @@ namespace ServiceLayer.Technician
 {
     public interface ITechnicianService
     {
-        Task<Response> AddIDphoto(IFormFile photo, string userEmail);
-        Task<Response> CompletePersonalData(string userEmail, ServiceProvideroutDTO user);
+        Task<Response> CompletePersonalData(string userEmail, ServiceProvideroutDTO user, IFormFile IDphoto);
         Task<Response> GetAllRepareOrderToAccept(string userEmail);
         Task<Response> GetOrderHistory(string userEmail, Enums.OrderBy orderBy);
         Task<Response> HandleOrderAction(string userEmail, string orderId, Enums.OrderAction action);
-        Task<Response> UpdatePersonaldata(string userEmail, Service_ProviderDto serviceProviderDto);
+        Task<Response> UpdatePersonaldata(string userEmail, UpdateServiceProviderDataDTO serviceProviderDto, IFormFile photo );
     }
 }

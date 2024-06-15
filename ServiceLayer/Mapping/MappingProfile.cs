@@ -15,7 +15,7 @@ namespace ServiceLayer.Mapping
 
             CreateMap<ApplicationUserDto, ApplicationUser>().ReverseMap();
             CreateMap<ApplicationUserRegisterDTO, ApplicationUser>().ReverseMap();
-            CreateMap<CompleteUserData, ApplicationUser>().ReverseMap();
+            CreateMap<CompleteUserDataDTO, ApplicationUser>().ReverseMap();
             CreateMap<CompleteSelerData, ApplicationUser>().ReverseMap();
             CreateMap<ApplicationUser, ServiceProvideroutDTO>().ReverseMap();
 
@@ -27,6 +27,7 @@ namespace ServiceLayer.Mapping
             CreateMap<Product, ProductOutputDTO>().ReverseMap();
 
             CreateMap<WinchDto, Winch>().ReverseMap();
+            CreateMap<WinchOutputDTO, Winch>().ReverseMap();
             CreateMap<WinchOrder, WinchOrderDTO>().ReverseMap();
 
             CreateMap<DiscountDto, Discount>().ForMember(des => des.Product, o => o.Ignore());
@@ -39,6 +40,9 @@ namespace ServiceLayer.Mapping
 
             CreateMap<ProductDto, Product_Shoppingcart>();
             CreateMap<ApplicationUser, Service_ProviderDto>().ReverseMap();
+
+
+            CreateMap<ApplicationUser, WinchDriverDto>().ForMember(des=>des.winchModel,x=>x.MapFrom(srs=>srs.WinchDriver.Winch.Model));
 
         }
     }

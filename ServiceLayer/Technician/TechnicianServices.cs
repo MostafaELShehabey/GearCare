@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
 using DomainLayer.Dto;
 using DomainLayer.Helpers;
 using DomainLayer.Models;
@@ -10,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static DomainLayer.Helpers.Enums;
+using Microsoft.Extensions.Options;
 
 namespace ServiceLayer.Technician
 {
@@ -18,61 +21,64 @@ namespace ServiceLayer.Technician
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly Cloudinary _cloudinary;
 
-        public TechnicianServices(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
+
+        public TechnicianServices(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager, IOptions<CloudinarySettings> config)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            var acc = new Account(
+                 config.Value.CloudName,
+                 config.Value.ApiKey,
+                 config.Value.ApiSecret
+             );
+
+            _cloudinary = new Cloudinary(acc);
         }
 
-        public async Task<Response> AddIDphoto(IFormFile photo, string userEmail)
+
+        private async Task<string> SaveIDPhotoAsync(IFormFile file)
         {
-            if (photo == null || photo.Length == 0)
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
             {
-                throw new InvalidOperationException("The photo is not added");
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "IDPhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
 
-            if (user == null)
+        }
+        private async Task<string> SavePersonalPhotoAsync(IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
             {
-                throw new InvalidOperationException("User not found");
-            }
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "PersonalPhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
-            var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "TechniccianIDphotos");
-            if (!Directory.Exists(photoUpload))
-            {
-                Directory.CreateDirectory(photoUpload);
+                return uploadResult.Uri.ToString();
             }
-            var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
-            var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
-            using (var stream = new FileStream(photoPath, FileMode.Create))
-            {
-                await photo.CopyToAsync(stream);
-            }
-
-            // Save photo path to database
-            if (user.IdPicture != null)
-            {
-                // Update existing photo path
-                user.IdPicture = photoPath;
-            }
-            else
-            {
-                // Create new photo entry
-                user.IdPicture = photoPath;
-            }
-
-            await _context.SaveChangesAsync();
-
-
-            var result = _mapper.Map<CompleteSelerData>(user);
-            return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
 
-
-        public async Task<Response> CompletePersonalData(string userEmail, ServiceProvideroutDTO ServiceProvider)
+        public async Task<Response> CompletePersonalData(string userEmail, ServiceProvideroutDTO ServiceProvider,IFormFile IDphoto)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
@@ -82,6 +88,7 @@ namespace ServiceLayer.Technician
             user.CarTypeToRepaire=ServiceProvider.CarTypeToRepaire;
             user.Spezilization=ServiceProvider.Spezilization;
             user.available = true;
+            user.IdPicture = await SaveIDPhotoAsync(IDphoto);
             var finduser = await _userManager.UpdateAsync(user);
             if (!finduser.Succeeded)
             {
@@ -151,12 +158,12 @@ namespace ServiceLayer.Technician
             return new Response { Model = result, StatusCode = 200 };
         }
 
-        public async Task<Response> UpdatePersonaldata(string userEmail, Service_ProviderDto serviceProviderDto)
+        public async Task<Response> UpdatePersonaldata(string userEmail, UpdateServiceProviderDataDTO serviceProviderDto,IFormFile photo)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user ID: {userEmail}");
+                throw new InvalidOperationException($"Invalid or non-existent user : {userEmail}");
             }
 
             user.Name = serviceProviderDto.Name;
@@ -164,7 +171,7 @@ namespace ServiceLayer.Technician
             user.Email = serviceProviderDto.CarTypeToRepaire;
             user.Location = serviceProviderDto.Location;
             user.Spezilization = serviceProviderDto.Spezilization;
-            user.PhotoId = serviceProviderDto.PhotoId;
+            user.PhotoId = await SavePersonalPhotoAsync(photo);
             await _context.SaveChangesAsync();
 
             var result = _mapper.Map<Service_ProviderDto>(user);
