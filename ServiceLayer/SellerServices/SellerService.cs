@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using DomainLayer.Dto;
+using DomainLayer.Helpers;
 using DomainLayer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,11 +21,21 @@ namespace ServiceLayer.SellerServices
         private readonly UserManager<ApplicationUser> _userManager ;
         private readonly IMapper _mapper ;
         private readonly ApplicationDbContext _context ;
-        public SellerService(UserManager<ApplicationUser> userManager, IMapper mapper, ApplicationDbContext context)
+        private readonly Cloudinary _cloudinary;
+        public SellerService(UserManager<ApplicationUser> userManager, IMapper mapper, ApplicationDbContext context, IOptions<CloudinarySettings> config)
         {
             _userManager = userManager;
             _mapper = mapper;
             _context = context;
+
+                var acc = new Account(
+                    config.Value.CloudName,
+                    config.Value.ApiKey,
+                    config.Value.ApiSecret
+                );
+
+            _cloudinary = new Cloudinary(acc);
+                
         }
 
         // Add ID photo 
@@ -40,18 +54,8 @@ namespace ServiceLayer.SellerServices
                 throw new InvalidOperationException("User not found");
             }
 
-            var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "SellerIDphotos");
-            if (!Directory.Exists(photoUpload))
-            {
-                Directory.CreateDirectory(photoUpload);
-            }
-            var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
-            var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
-            using (var stream = new FileStream(photoPath, FileMode.Create))
-            {
-                await photo.CopyToAsync(stream);
-            }
-
+           
+            var photoPath = await SaveSellerIDPhotoAsync(photo);
             // Save photo path to database
             if (user.IdPicture != null)
             {
@@ -67,32 +71,86 @@ namespace ServiceLayer.SellerServices
             await _context.SaveChangesAsync();
 
 
-            var result= _mapper.Map<CompleteSelerData>(user);
-            return new Response { IsDone=true,Model = result, StatusCode=200};
+            var result = _mapper.Map<CompleteSelerData>(user);
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
 
 
+
+
+
+        private async Task<string> SaveProductPhotoAsync(IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "ProductPhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
+            }
+
+
+        }
+
+        private async Task<string> SaveSellerIDPhotoAsync(IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "SellerID"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
+            }
+
+
+        }
+
+
+
         // Add product
-        public async Task<Response> AddProduct(ProductDto productDto, string userEmail)
+        public async Task<Response> AddProduct(ProductDto? productDto,IFormFileCollection images ,string userEmail)
         {
 
             var sellerId = _context.Users.First(x=>x.Email==userEmail).Id;
-            if (string.IsNullOrWhiteSpace(productDto.Name) || productDto.Price <= 0 || string.IsNullOrWhiteSpace(productDto.Description) || string.IsNullOrWhiteSpace(sellerId))
+            if (string.IsNullOrWhiteSpace(productDto.Name) && productDto.Price <= 0 && string.IsNullOrWhiteSpace(productDto.Description) && string.IsNullOrWhiteSpace(sellerId))// Logical Error 
             {
-                throw new ArgumentException("Invalid product or seller information.");
+                return new Response { Messege = "Invalid product or seller information." , StatusCode=400 };
             }
 
-            var category = _context.Categories.Where(x => x.Id == productDto.CategoryId);
-            if(category is null)
+            var category = await _context.Categories.AnyAsync(x => x.Id == productDto.CategoryId);
+            if(!category)
             {
-                return new Response { IsDone = false ,Messege="category id not correct !"};
+                return new Response { IsDone = false ,Messege="Category NOT Found !", StatusCode=404};
             }
+            var urls = new List<string>();
+            foreach (var photo in images)
+            {
+                var  photoPath =await SaveProductPhotoAsync(photo);
+                urls.Add(photoPath);
+            }
+
             var product = new Product
             { 
-                //Id = Guid.NewGuid().ToString(),
                 Name = productDto.Name,
                 price = productDto.Price,
                 Description = productDto.Description,
+                PictureURL = urls,
                 SellerId = sellerId,
                 Categoryid = productDto.CategoryId,
                 instock = true,
@@ -104,67 +162,77 @@ namespace ServiceLayer.SellerServices
             {
                 throw new Exception("Seller not found");
             }
+
             if (!await _context.Categories.AnyAsync(c => c.Id == productDto.CategoryId))
             {
                 throw new Exception("Category not found");
             }
+
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
+
             var result = _mapper.Map<ProductOutputDTO>(product);
             return new Response { IsDone = true, Model = result,StatusCode=200 };
         }
 
-        //add product photo 
-        public async Task<Response> AddProductPhoto(IFormFileCollection photos, string productid)
+      
+
+        //Delete product photo 
+        public async Task<Response> DeleteProductPhoto(string productId, string photoUrl, string userEmail)
         {
-            if (photos == null || photos.Count == 0)
+            // Fetch the seller
+            var seller = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
+            if (seller == null)
             {
-                throw new InvalidOperationException(" NO photo selected !");
-            }
-            var product = await _context.Products.Include(u => u.Photos).FirstOrDefaultAsync(u => u.Id == productid);
-            var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "Prouctphotos");
-            if (!Directory.Exists(photoUpload))
-            {
-                Directory.CreateDirectory(photoUpload);
-            }
-            var photoList = new List<Photo>();
-            foreach (var photo in photos)
-            {
-                if (photo.Length > 0)
-                {
-                    var uniquePhotoName = Guid.NewGuid().ToString() + "_" +photo.Name;
-                    var photoPath = Path.Combine(photoUpload, uniquePhotoName);
-                    using (var stream = new FileStream(photoPath, FileMode.Create))
-                    {
-                        await photo.CopyToAsync(stream);
-                    }
-                    // Save the file path to the database
-                    var newphoto = new Photo
-                    {
-                        photoURL = photoPath, 
-                        productID = productid
-                    };
-                    photoList.Add(newphoto);
-                }
+                return new Response { Messege = "Seller not found.", StatusCode = 404 };
             }
 
-            // Save all photos to the database
-            await _context.photos.AddRangeAsync(photoList);
+            // Fetch the product
+            var product = await _context.Products.Include(p => p.PictureURL).FirstOrDefaultAsync(p => p.Id == productId && p.SellerId == seller.Id);
+            if (product == null)
+            {
+                return new Response { Messege = "Product not found or you're not authorized.", StatusCode = 404 };
+            }
+
+            // Check if the photo exists in the product's list of photos
+            var photo = product.PictureURL.FirstOrDefault(p => p == photoUrl);
+            if (photo == null)
+            {
+                return new Response { Messege = "Photo not found in the product.", StatusCode = 404 };
+            }
+
+            // Remove the photo from the product's list of photos
+            product.PictureURL.Remove(photo);
+
+            // Optionally, delete the photo file from storage
+            // This assumes you have a method DeleteFileAsync to handle file deletion
+            //await DeleteFileAsync(photoUrl);
+
+            // Save changes to the database
             await _context.SaveChangesAsync();
 
-            var productDto = new AllProductDataDTO
-            {
-                Name = product.Name,
-                OriginalPrice = product.price,
-                Description = product.Description,
-                SellerId = product.SellerId,
-                CategoryId = product.Categoryid,
-                Discount = product.Discount != null ? new DiscountDto { Persentage = product.Discount.Persentage } : null,
-                PictureURL = product.Photos.Select(p => p.photoURL).ToList()
-            };
-
-            return new Response { IsDone = true, Model = productDto , StatusCode=200};
+            return new Response { IsDone = true, Messege = "Photo deleted successfully.", StatusCode = 200 };
         }
+
+        private async Task DeleteFileAsync(string photoUrl)
+        {
+            try
+            {
+                if (File.Exists(photoUrl))
+                {
+                    File.Delete(photoUrl);
+                }
+            }
+            catch (Exception ex)
+            {
+               
+                Console.WriteLine($"Error deleting file: {ex.Message}");
+                throw;
+            }
+
+            await Task.CompletedTask;
+        }
+
 
         // Update product
         public async Task<Response> UpdateProduct(string productId, ProductDto productDto)
@@ -334,5 +402,7 @@ namespace ServiceLayer.SellerServices
                var result =  _context.discounts.ToList();
            return new Response { Model = result ,IsDone= true , StatusCode=200};
         }
+
+       
     }
 }

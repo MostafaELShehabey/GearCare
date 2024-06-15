@@ -14,7 +14,7 @@ namespace GearCareAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "Seller")]
+   [Authorize(Roles = "Seller")]
     public class SellerController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -23,8 +23,8 @@ namespace GearCareAPI.Controllers
         private readonly ISellerServices _sellerService;
         public SellerController(ISellerServices sellerServices, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
-            _sellerService = sellerServices;
-            _userManager = userManager;
+            this._sellerService = sellerServices;
+            this._userManager = userManager;
             this.configuration = configuration;
         }
 
@@ -56,7 +56,7 @@ namespace GearCareAPI.Controllers
 
         // Add product
         [HttpPost("AddProduct")]
-        public async Task<IActionResult> AddProduct([FromForm] ProductDto? ProductDto)
+        public async Task<IActionResult> AddProduct([FromForm] ProductDto? ProductDto, IFormFileCollection? photos)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace GearCareAPI.Controllers
                     return Unauthorized(new { Message = "User ID is empty." });
                 }
 
-                var Product = await _sellerService.AddProduct(ProductDto, userEmail);
+                var Product = await _sellerService.AddProduct(ProductDto,photos,userEmail);
                 return Ok(Product);
             }
             catch (Exception ex)
@@ -80,6 +80,35 @@ namespace GearCareAPI.Controllers
                 return StatusCode(500, $" internal server error {ex.Message}");
             }
         }
+
+        [HttpDelete("RemoveProductPhoto")]
+        public async Task<IActionResult> RemoveProductPhoto([FromForm] string productId , string photoUrl)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { Message = "User ID not found in token." });
+                }
+
+                var userEmail = userIdClaim.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return Unauthorized(new { Message = "User ID is empty." });
+                }
+
+                var Product = await _sellerService.DeleteProductPhoto(productId, photoUrl, userEmail);
+                return Ok(Product);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $" internal server error {ex.Message}");
+            }
+        }
+
+
+
 
         // Update product
         [HttpPut("UpdateProduct/{productId}")]

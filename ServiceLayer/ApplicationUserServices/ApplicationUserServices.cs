@@ -59,8 +59,6 @@ namespace ServiceLayer.ApplicationUserServices
         // get lis of availabe service provider 
         public async Task<Response> GetServiceProviderAvailable(UserType userType, string location, string Cartype)
         {
-
-           
             if (userType.ToString() == "WinchDriver") {
 
                 if (location == null || Cartype == null)
@@ -176,23 +174,32 @@ namespace ServiceLayer.ApplicationUserServices
         //get all product (randoum )
         public async Task<Response> GetAllProducts(string? search)
         {
-            var query = await _context.Products.ToListAsync();
+            var query =  _context.Products.AsQueryable();
             // filter products based on name, price, or category
-            if (search is not null)
+            if (!string.IsNullOrEmpty(search))
             {
+                search = search.ToLower();
                 query = query.Where(p =>
-                    p.Name.Contains(search) ||
-                    p.price.ToString().Contains(search) ||
-                    p.Categorys.Name.Contains(search)).ToList();
+                    p.Name.ToLower().Contains(search) ||
+                    p.price.ToString().Contains(search) || // Assuming price is a string, adjust accordingly if it's a number
+                    p.Description.ToLower().Contains(search) ||
+                    p.Categorys.Name.ToLower().Contains(search));
+
+                var result = await query.ToListAsync();
+                if (!result.Any())
+                {
+                    return new Response { IsDone = false, Messege = "the product not Exit , try to search with differnt Name or Category ! ", StatusCode = 404 };
+                }
+                return new Response { IsDone = true, Model = result, StatusCode = 200 };
             }
             else
             {
                 // Shuffle the products randomly
                 // Fetch the data into memory and then order it randomly
-                var product = query.ToList(); // Fetch data into memory
-                product = product.OrderBy(p => Guid.NewGuid()).ToList(); // Shuffle in memory
+                // Fetch data into memory
+                var product = await query.OrderBy(p => Guid.NewGuid()).ToListAsync();// Shuffle in memory
+                return new Response { IsDone = true, Model = query ,StatusCode=200};
             }
-            return new Response { IsDone = true, Model = query ,StatusCode=200};
         }
 
 

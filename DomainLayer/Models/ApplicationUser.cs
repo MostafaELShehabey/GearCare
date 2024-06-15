@@ -37,7 +37,7 @@ namespace DomainLayer.Models
         public string? CarTypeToRepaire { get; set; } = null;
 
        
-
+        //navigation properity 
         [ForeignKey("userphotoId")]
         public Photo photo { get; set; }
         public WinchDriver WinchDriver { get; set; }
