@@ -14,6 +14,7 @@ namespace ServiceLayer.Mapping
         public MappingProfile() {
 
             CreateMap<ApplicationUserDto, ApplicationUser>().ReverseMap();
+            CreateMap<ApplicationUserRegisterDTO, ApplicationUser>().ReverseMap();
             CreateMap<CompleteUserData, ApplicationUser>().ReverseMap();
             CreateMap<CompleteSelerData, ApplicationUser>().ReverseMap();
             CreateMap<ApplicationUser, ServiceProvideroutDTO>().ReverseMap();

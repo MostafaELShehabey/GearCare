@@ -23,14 +23,13 @@ namespace GearCareAPI.Controllers
 
         public AccountController(IAuthService authService, IConfiguration configuration, UserManager<ApplicationUser> userManager)
         {
-
             this._authService = authService;
             this.configuration = configuration;
             this._userManager = userManager;
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> RegisterNewUser([FromForm] ApplicationUserDto applicationUserDto)
+        public async Task<IActionResult> RegisterNewUser([FromForm] ApplicationUserRegisterDTO applicationUserDto , IFormFile ?photo)
         {
             try
             {
@@ -38,7 +37,7 @@ namespace GearCareAPI.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var result = await _authService.RegisterAsync(applicationUserDto);
+                var result = await _authService.RegisterAsync(applicationUserDto , photo);
 
                 if (!result.IsAuthenticated)
                 {
@@ -56,27 +55,7 @@ namespace GearCareAPI.Controllers
             }
         }
 
-        [HttpPost("AddPersonalpicture")]
-        [Authorize(Roles = "Client,Mechanic,Electrician,WinchDriver,Seller")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> Addpersonalpicture(IFormFile photo )
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var result = await _authService.AddPersonalphoto(photo, userEmail);
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.InnerException}");
-            }
-        }
+       
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(LoginDto login)
@@ -96,7 +75,6 @@ namespace GearCareAPI.Controllers
 
         [HttpPost("ChangePassword")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        //[Authorize(Roles ="Seller")]
         public async Task<IActionResult> ChangePasswordAsync(ChangepasswordDTO model)
         {
             if (ModelState.IsValid)
@@ -111,19 +89,6 @@ namespace GearCareAPI.Controllers
             return BadRequest("Failed Process To Change Password");
 
         }
-
-        //[HttpPost("LogOut")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        //public async Task<IActionResult> LogOut()
-        //{
-        //    var Result = await _authService.LogoutAsync();
-        //    if (Result.IsDone == true)
-        //    {
-        //        return StatusCode(Result.StatusCode, Result.Messege);
-        //    }
-        //    return StatusCode(Result.StatusCode, Result.Messege);
-        //}
-
 
     }
 }

@@ -14,6 +14,8 @@ using static DomainLayer.Helpers.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
 
 namespace ServiceLayer.AuthServices
 {
@@ -26,13 +28,16 @@ namespace ServiceLayer.AuthServices
         private readonly JWT _jwt;
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly Cloudinary _cloudinary;
+
         public AuthService(ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManage,
             IMapper mapper,
             IOptions<JWT> jwt,
-            IHttpContextAccessor httpContextAccessor  )
+            IHttpContextAccessor httpContextAccessor ,
+            IOptions<CloudinarySettings> config)
         {
             this._userManager = userManager;
             this._roleManager = roleManage;
@@ -41,9 +46,16 @@ namespace ServiceLayer.AuthServices
             this._context = context;
             this._contextAccessor = httpContextAccessor;
             this._signInManager = signInManager;
+            var acc = new Account(
+                  config.Value.CloudName,
+                  config.Value.ApiKey,
+                  config.Value.ApiSecret
+              );
+
+            _cloudinary = new Cloudinary(acc);
 
         }
-        public async Task<AuthModel> RegisterAsync(ApplicationUserDto appUserDto)
+        public async Task<AuthModel> RegisterAsync(ApplicationUserRegisterDTO appUserDto,IFormFile? photo)
         {
             try
             {
@@ -75,10 +87,19 @@ namespace ServiceLayer.AuthServices
                 {
                     return new AuthModel { Message = "Email is already register ! " };
                 }
-
+                //if (appUserDto.PhotoId != null)
+                //{
+                   // appUserDto.PhotoId = await SavePersonalPhotoAsync(photo);
+                //}
                 var user = _mapper.Map<ApplicationUser>(appUserDto);
                 user.UserType = appUserDto.UserType;
-                user.PhotoId = "images/Personalphoto/DefaultPersonalPhoto.jpg";
+                if (photo == null)
+                {
+                    user.PhotoId = "https://res.cloudinary.com/dzyzohlli/image/upload/v1718175218/Default_Photo/kojfrcqeng2gglbvsrht.png";
+                }
+                else {
+                    user.PhotoId = await SavePersonalPhotoAsync(photo);
+                }
                 var result = await _userManager.CreateAsync(user, appUserDto.Password);
                 if (!result.Succeeded)
                 {
@@ -106,7 +127,7 @@ namespace ServiceLayer.AuthServices
             catch (Exception ex)
             {
                 return new AuthModel { Message = $"An error occurred during registration.{ex.InnerException}" };
-}
+            }
         }
 
         public async Task<AuthModel> GetJwtToken(LoginDto Dto) 
@@ -208,49 +229,74 @@ namespace ServiceLayer.AuthServices
 
 
 
-        public async Task<ApplicationUserDto> AddPersonalphoto(IFormFile photo, string userEmail)
+        //public async Task<ApplicationUserDto> AddPersonalphoto(IFormFile photo, string userEmail)
+        //{
+        //    if (photo == null || photo.Length == 0)
+        //    {
+        //        throw new InvalidOperationException("The photo is not added");
+        //    }
+
+        //    var user = await _context.Users.FirstOrDefaultAsync(x => x.Email==userEmail);
+
+        //    if (user == null)
+        //    {
+        //        throw new InvalidOperationException("User not found");
+        //    }
+
+        //    var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "Personalphoto");
+        //    if (!Directory.Exists(photoUpload))
+        //    {
+        //        Directory.CreateDirectory(photoUpload);
+        //    }
+        //    var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
+        //    var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
+        //    using (var stream = new FileStream(photoPath, FileMode.Create))
+        //    {
+        //        await photo.CopyToAsync(stream);
+        //    }
+
+        //    // Save photo path to database
+        //    if (user.PhotoId != null)
+        //    {
+        //        // Update existing photo path
+        //        user.PhotoId = photoPath;
+        //    }
+        //    else
+        //    {
+        //        // Create new photo entry
+        //        user.PhotoId = photoPath;
+        //    }
+
+        //    await _context.SaveChangesAsync();
+
+
+        //    return _mapper.Map<ApplicationUserDto>(user);
+        //}
+
+
+        private async Task<string> SavePersonalPhotoAsync(IFormFile file)
         {
-            if (photo == null || photo.Length == 0)
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
             {
-                throw new InvalidOperationException("The photo is not added");
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "PersonalPhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
             }
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email==userEmail);
 
-            if (user == null)
-            {
-                throw new InvalidOperationException("User not found");
-            }
-
-            var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "Personalphoto");
-            if (!Directory.Exists(photoUpload))
-            {
-                Directory.CreateDirectory(photoUpload);
-            }
-            var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
-            var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
-            using (var stream = new FileStream(photoPath, FileMode.Create))
-            {
-                await photo.CopyToAsync(stream);
-            }
-
-            // Save photo path to database
-            if (user.PhotoId != null)
-            {
-                // Update existing photo path
-                user.PhotoId = photoPath;
-            }
-            else
-            {
-                // Create new photo entry
-                user.PhotoId = photoPath;
-            }
-
-            await _context.SaveChangesAsync();
-
-
-            return _mapper.Map<ApplicationUserDto>(user);
         }
+
+
+
 
 
         public async Task<ApplicationUser> GetCurrentUserASync()
@@ -302,90 +348,10 @@ namespace ServiceLayer.AuthServices
             return authModel;
         }
 
-
-        //public async Task<Response> LogoutAsync()
-        //{
-        //    var Response = new Response();
-        //    var userEmail = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    if (string.IsNullOrEmpty(userEmail))
-        //    {
-        //         Response.Messege= "User is not authenticated.";
-        //        return Response;
-        //    }
-        //    var user = await _userManager.FindByEmailAsync(userEmail);
-        //    if (user is null)
-        //    {
-        //        return new Response { Messege = "UnAuthorize user", StatusCode = 401, IsDone = false };
-        //    }
-        //    await _signInManager.SignOutAsync();
-        //    return new Response { Messege = "user logged out Successfully" };
-        //}
-
        
-        //public async Task<ApplicationUser> RegisterWithoutTokenAsync(ApplicationUserDto user)
-        //{
-        //    var data = _mapper.Map<ApplicationUser>(user);
-        //    data.UserType = UserType.Client;
-        //    IdentityResult result = await _userManager.CreateAsync(data, user.Password);
-        //    if (result.Succeeded)
-        //    {
-        //        return data;
-        //    }
-        //    else
-        //    {
-        //        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-        //        throw new Exception($"Registration failed: {errors}");
-        //    }
-        //}
 
 
 
-
-        //public async Task<bool> AddPersonalphoto(IFormFile photo, string userid)
-        //{
-        //    var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userid);
-
-        //    if (user == null)
-        //    {
-        //             throw new InvalidOperationException("User not found");
-        //    }
-        //    if (photo == null || photo.Length == 0)
-        //    {
-        //        throw new InvalidOperationException(" the photo not added");
-        //    }
-
-        //    var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "Personalphoto");
-        //    if (!Directory.Exists(photoUpload))
-        //    {
-        //        Directory.CreateDirectory(photoUpload);
-        //    }
-        //    var photoUniquname = Guid.NewGuid().ToString() + "_" + photo.Name;
-        //    var photoPath = Path.Combine(photoUpload, photoUniquname);
-        //    using (var stream = new FileStream(photoPath, FileMode.Create))
-        //    {
-        //        await photo.CopyToAsync(stream);
-        //    }
-        //    // save photo path to database
-        //    if (user.PhotoId != null)
-        //    {
-        //        // Update existing photo path
-        //        user.PhotoId = photoPath;
-        //        _context.ApplicationUsers.Update(user);
-        //    }
-        //    else
-        //    {
-        //        // Create new photo entry
-        //        var newPhoto = new Photo
-        //        {
-        //            userid = userid,
-        //            photoURL = photoPath
-        //        };
-        //        await _context.photos.AddRangeAsync(newPhoto);
-        //    }
-        //    //   await _context.photos.AddRangeAsync(photospath);
-        //    _context.SaveChanges();
-        //    return true;
-        //}
 
     }
 

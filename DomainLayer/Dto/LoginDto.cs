@@ -13,5 +13,6 @@ namespace DomainLayer.Dto
         public string username { get; set; }
         [Required]
         public string password { get; set; }
+     
     }
 }

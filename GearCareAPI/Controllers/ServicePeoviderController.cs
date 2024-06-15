@@ -1,5 +1,6 @@
 ﻿using DomainLayer.Dto;
 using DomainLayer.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Technician;
@@ -12,6 +13,7 @@ namespace GearCareAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Roles = "Mechanic,Electrician")]
     public class ServiceProviderController : ControllerBase
     {
@@ -23,7 +25,6 @@ namespace GearCareAPI.Controllers
         }
 
         [HttpPost("AddIDpicture")]
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> AddIDpicture(IFormFile photo)
         {
             try

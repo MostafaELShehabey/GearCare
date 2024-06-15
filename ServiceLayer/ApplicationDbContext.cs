@@ -14,17 +14,14 @@ namespace ServiceLayer
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options) { }
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //    => optionsBuilder.UseSqlite("Data Source= GearCare.db");
-                
-        
+           
+
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Photo> photos { get; set; }
         public DbSet<Product_Shoppingcart> product_Shoppingcarts { get; set; }
         public DbSet<RepareOrder> RepareOrders { get; set; }
-        //public DbSet<Service_Provider> ServiceProviders { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<WinchDriver> WinchDrivers { get; set; }
         public DbSet<WinchOrder> WinchOrders { get; set; }
@@ -40,10 +37,10 @@ namespace ServiceLayer
         //        .WithOne(p => p.user)
         //        .HasForeignKey<Photo>(c => c.userid);
 
-            //builder.Entity<Product>()
-            //.HasMany(p => p.Photos)           
-            //.WithOne(photo => photo.Product) 
-            //.HasForeignKey(photo => photo.photoURL);
+        //    builder.Entity<Product>()
+        //    .HasMany(p => p.Photos)
+        //    .WithOne(photo => photo.Product)
+        //    .HasForeignKey(photo => photo.photoURL);
         //}
 
     }

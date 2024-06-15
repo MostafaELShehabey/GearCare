@@ -12,8 +12,8 @@ namespace ServiceLayer.SellerServices
     public interface ISellerServices
     {
         Task<Response> AddIDphoto(IFormFile photo, string userEmail);
-
-        Task<Response> AddProduct(ProductDto productDto,string userId);
+        Task<Response> DeleteProductPhoto(string productId, string photoUrl, string userEmail);
+        Task<Response> AddProduct(ProductDto productDto, IFormFileCollection images, string userEmail);
         Task<Response> UpdateProduct(string productId, ProductDto productDto);
         Task< Response >DeleteProduct(string productId);
 

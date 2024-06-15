@@ -29,7 +29,7 @@ var configuration = new ConfigurationBuilder()
 // Add services to the container.
 //builder.Services.AddDbContext<ApplicationDbContext>(options =>{ options.UseSqlite("Data Source=GearCare1.db"); });
 builder.Services.AddDbContext<ApplicationDbContext>(optient => optient.UseSqlServer(builder.Configuration.GetConnectionString("MyConn")));
-
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("Cloudinary"));
 builder.Services.AddCors();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddSignInManager<SignInManager<ApplicationUser>>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -57,32 +57,35 @@ builder.Services.AddLogging();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // this line for serving sataic files (photos)
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-//app.UseExceptionHandler(appBuilder =>
-//{
-//    appBuilder.Run(async context =>
-//    {
-//        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-//        context.Response.ContentType = "application/json";
-//        var error = context.Features.Get<IExceptionHandlerFeature>();
-//        if (error != null)
-//        {
-//            var ex = error.Error;
+app.UseExceptionHandler(appBuilder =>
+{
+    appBuilder.Run(async context =>
+    {
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.ContentType = "application/json";
+        var error = context.Features.Get<IExceptionHandlerFeature>();
+        if (error != null)
+        {
+            var ex = error.Error;
 
-//            var result = JsonConvert.SerializeObject(new { message = ex.Message });
-//            await context.Response.WriteAsync(result);
-//        }
-//    });
-//});
+            var result = JsonConvert.SerializeObject(new { message = ex.Message });
+            await context.Response.WriteAsync(result);
+        }
+    });
+});
 
 app.MapControllers();
 
