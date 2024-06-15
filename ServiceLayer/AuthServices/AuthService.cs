@@ -87,10 +87,7 @@ namespace ServiceLayer.AuthServices
                 {
                     return new AuthModel { Message = "Email is already register ! " };
                 }
-                //if (appUserDto.PhotoId != null)
-                //{
-                   // appUserDto.PhotoId = await SavePersonalPhotoAsync(photo);
-                //}
+                
                 var user = _mapper.Map<ApplicationUser>(appUserDto);
                 user.UserType = appUserDto.UserType;
                 if (photo == null)
@@ -115,9 +112,8 @@ namespace ServiceLayer.AuthServices
                 var jwtSecurityToken = await CreateJwtToken(user);
                return new AuthModel
                {
-                    Email = user.Email,
                     ExpiresOn = jwtSecurityToken.ValidTo,
-                    UserName = user.UserName,
+                    User = _mapper.Map<CompleteUserDataDTO>(user),
                     IsAuthenticated = true,
                     Roles = new List<string> {role },
                     Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
@@ -141,10 +137,9 @@ namespace ServiceLayer.AuthServices
             }
             var jwtSecurityToken = await CreateJwtToken(user);
             var rolesList = await _userManager.GetRolesAsync(user);
-            authmodel.UserName = user.UserName;
             authmodel.Roles=rolesList.ToList();
             authmodel.IsAuthenticated = true;
-            authmodel.Email=user.Email;
+            authmodel.User=_mapper.Map<CompleteUserDataDTO>(user);
             authmodel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authmodel.ExpiresOn = jwtSecurityToken.ValidTo;
             return authmodel;
@@ -219,59 +214,12 @@ namespace ServiceLayer.AuthServices
                     {
                         IsAuthenticated = true,
                         Token = new JwtSecurityTokenHandler().WriteToken(token),
-                        Email = user.Email,
-                        UserName = user.UserName,
+                        User = _mapper.Map<CompleteUserDataDTO>(user),
                         ExpiresOn = token.ValidTo,
                         Roles = roles.ToList()
                     };
               }
 
-
-
-
-        //public async Task<ApplicationUserDto> AddPersonalphoto(IFormFile photo, string userEmail)
-        //{
-        //    if (photo == null || photo.Length == 0)
-        //    {
-        //        throw new InvalidOperationException("The photo is not added");
-        //    }
-
-        //    var user = await _context.Users.FirstOrDefaultAsync(x => x.Email==userEmail);
-
-        //    if (user == null)
-        //    {
-        //        throw new InvalidOperationException("User not found");
-        //    }
-
-        //    var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "Personalphoto");
-        //    if (!Directory.Exists(photoUpload))
-        //    {
-        //        Directory.CreateDirectory(photoUpload);
-        //    }
-        //    var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
-        //    var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
-        //    using (var stream = new FileStream(photoPath, FileMode.Create))
-        //    {
-        //        await photo.CopyToAsync(stream);
-        //    }
-
-        //    // Save photo path to database
-        //    if (user.PhotoId != null)
-        //    {
-        //        // Update existing photo path
-        //        user.PhotoId = photoPath;
-        //    }
-        //    else
-        //    {
-        //        // Create new photo entry
-        //        user.PhotoId = photoPath;
-        //    }
-
-        //    await _context.SaveChangesAsync();
-
-
-        //    return _mapper.Map<ApplicationUserDto>(user);
-        //}
 
 
         private async Task<string> SavePersonalPhotoAsync(IFormFile file)

@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using DomainLayer.Dto;
 using DomainLayer.Helpers;
 using DomainLayer.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ServiceLayer.WinchDriverService;
 using System;
 using System.Collections.Generic;
@@ -22,15 +25,80 @@ namespace ServiceLayer.WinchDriverServise
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
+        private readonly Cloudinary _cloudinary;
 
-        public WinchDriverServise(ApplicationDbContext context, IMapper mapper,UserManager<ApplicationUser> userManager)
+        public WinchDriverServise(ApplicationDbContext context, IMapper mapper,UserManager<ApplicationUser> userManager , IOptions<CloudinarySettings> config)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            var acc = new Account
+            (
+                config.Value.CloudName,
+                config.Value.ApiKey,
+                config.Value.ApiSecret
+            );
+            _cloudinary = new Cloudinary(acc);
+        }
+        private async Task<string> WinchlicencePhotos(IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "WinchlicencePhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
+            }
         }
 
-        public async Task<Response> CompleteWinchData(string userEmail, WinchModel winchdata)
+        private async Task<string> WinchPhotos(IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "WinchPhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
+            }
+        }
+
+        private async Task<string> SavePersonalPhotoAsync(IFormFile file)
+        {
+
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "PersonalPhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
+            }
+        }
+
+
+        public async Task<Response> CompleteWinchData(string userEmail, WinchModel winchdata, IFormFileCollection WinchlicencePhoto, IFormFileCollection winchPhoto)
         {
             var driver = await _userManager.FindByEmailAsync(userEmail);
             if (driver == null)
@@ -39,155 +107,84 @@ namespace ServiceLayer.WinchDriverServise
             }
             driver.Spezilization = winchdata.Spezilization;
             var winch =  await _context.Winchs.FirstOrDefaultAsync(x => x.WinchDriver.Id == driver.Id);
+
+            var winchphotoURL = new List<string>();
+            foreach(var photo in winchPhoto)
+            {
+                var photopath = await WinchPhotos(photo);
+                winchphotoURL.Add(photopath);
+            }
+
+            if (WinchlicencePhoto.Count() > 1)
+            {
+                return   new Response { IsDone = false, Messege= "Add 2 picture , front and back of wich licence ",  StatusCode = 400 };
+            }
+
+            var licenceURL = new List<string>();    
+            for (int i = 0; i <=1;i++)
+            {
+                var photopath = await WinchlicencePhotos(WinchlicencePhoto[i]);
+                licenceURL.Add(photopath);
+            }
+
             var data = new Winch
             {
                 Model = winchdata.Model,
                 DriverId = driver.Id,
                 Availabile = true,
-                Licence=null,
-                photo=null
-      
+                Licence = licenceURL,
+                photo = winchphotoURL
+
             };
 
             await _context.Winchs.AddAsync(data);
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<WinchDto>(data);
+            var result = _mapper.Map<WinchOutputDTO>(data);
             return new Response { IsDone = true,Model = result, StatusCode =200};
         }
 
 
-        public async Task<Response> AddIDphoto(IFormFile photo, string userEmail)
+        private async Task<string> WinchDriverIDPhotos(IFormFile file)
         {
-            if (photo == null || photo.Length == 0)
-            {
-                throw new InvalidOperationException("The photo is not added");
-            }
 
+            if (file == null || file.Length == 0)
+                throw new ArgumentNullException("file", "No file uploaded");
+
+            using (var stream = file.OpenReadStream())
+            {
+                var uploadParams = new ImageUploadParams()
+                {
+                    File = new FileDescription(file.FileName, stream),
+                    Folder = "WinchDriverIDPhotos"
+                };
+                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+
+                return uploadResult.Uri.ToString();
+            }
+        }
+
+
+
+        public async Task<Response> AddIDphoto(IFormFileCollection photo, string userEmail)
+        {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
-
-            if (user == null)
+            var IDURL = new List<string>();
+            for (int i = 0; i < 2; i++)
             {
-                throw new InvalidOperationException("User not found");
-            }
-
-            var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "WinchDriverIDphotos");
-            if (!Directory.Exists(photoUpload))
-            {
-                Directory.CreateDirectory(photoUpload);
-            }
-            var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
-            var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
-            using (var stream = new FileStream(photoPath, FileMode.Create))
-            {
-                await photo.CopyToAsync(stream);
-            }
-
-            // Save photo path to database
-            if (user.IdPicture != null)
-            {
-                // Update existing photo path
-                user.IdPicture = photoPath;
-            }
-            else
-            {
-                // Create new photo entry
-                user.IdPicture = photoPath;
+                var photopath = await WinchlicencePhotos(photo[i]);
+                IDURL.Add(photopath);
             }
 
             await _context.SaveChangesAsync();
-
 
             var result = _mapper.Map<CompleteSelerData>(user);
             return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
 
 
-        public async Task<Response> AddLicencePhoto(IFormFile photo, string userEmail)
-        {
-            if (photo == null || photo.Length == 0)
-            {
-                throw new InvalidOperationException("The photo is not added");
-            }
+       
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
-            var winch = await _context.Winchs.FirstOrDefaultAsync(x => x.DriverId == user.Id);
-            if (user == null)
-            {
-                throw new InvalidOperationException("User not found");
-            }
-
-            var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "WinchDriverLicencephotos");
-            if (!Directory.Exists(photoUpload))
-            {
-                Directory.CreateDirectory(photoUpload);
-            }
-            var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
-            var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
-            using (var stream = new FileStream(photoPath, FileMode.Create))
-            {
-                await photo.CopyToAsync(stream);
-            }
-            // Save photo path to database
-            if (winch.Licence != null)
-            {
-                // Update existing photo path
-                winch.Licence = photoPath;
-            }
-            else
-            {
-                // Create new photo entry
-                winch.Licence = photoPath;
-            }
-            await _context.SaveChangesAsync();
-            var result = _mapper.Map<WinchDto>(winch);
-            return new Response { IsDone = true, Model = result, StatusCode = 200 };
-        }
-
-
-        public async Task<Response> AddWinchPhoto(IFormFile photo, string userEmail)
-        {
-            if (photo == null || photo.Length == 0)
-            {
-                throw new InvalidOperationException("The photo is not added");
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
-            var winch = await _context.Winchs.FirstOrDefaultAsync(x => x.DriverId == user.Id);
-            if (user == null)
-            {
-                throw new InvalidOperationException("User not found");
-            }
-
-            var photoUpload = Path.Combine(Directory.GetCurrentDirectory(), "images", "Winchphotos");
-            if (!Directory.Exists(photoUpload))
-            {
-                Directory.CreateDirectory(photoUpload);
-            }
-            var photoUniquname = Guid.NewGuid().ToString() + "_" + Path.GetFileName(photo.FileName);
-            var photoPath = Path.Combine(photoUpload, photoUniquname).Replace("\\", "/");
-            using (var stream = new FileStream(photoPath, FileMode.Create))
-            {
-                await photo.CopyToAsync(stream);
-            }
-
-            // Save photo path to database
-            if (winch.photo != null)
-            {
-                // Update existing photo path
-                winch.photo = photoPath;
-            }
-            else
-            {
-                // Create new photo entry
-                winch.photo = photoPath;
-            }
-
-            await _context.SaveChangesAsync();
-
-            winch.DriverId=user.Id;
-            var result = _mapper.Map<WinchDto>(winch);
-            return new Response { IsDone = true, Model = result, StatusCode = 200 };
-        }
+      
 
         public async Task<Response> HandleOrderAction(string userEmail, string orderId, OrderAction action)
         {
@@ -284,25 +281,28 @@ namespace ServiceLayer.WinchDriverServise
 
         }
 
-        public async Task<Response> UpdatePersonalData(string userEmail, WinchDriverDto driverDto)
+        public async Task<Response> UpdatePersonalData(string userEmail, WinchDriverDto driverDto, IFormFile photo)
         {
-            var userdata = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
-            var userid = userdata.Id;
-
-            var user = await _userManager.FindByIdAsync(userid);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
                 throw new InvalidOperationException("User not found for update.");
             }
+            var winch = _context.Winchs.FirstOrDefault(x => x.DriverId == user.Id);
+
             user.Name = driverDto.Name;
             user.CarType = driverDto.winchModel;
+            user.PhotoId = await SavePersonalPhotoAsync(photo);
             user.Location =driverDto.Location;
             user.Spezilization =driverDto.Spezilization;
+            winch.Model = driverDto.winchModel;
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<Service_ProviderDto>(user);
+            var result = _mapper.Map<WinchDriverDto>(user);
             return new Response { Model = result, StatusCode = 200, Messege = "your data is updated successfully " };
+
         }
 
-       
+      
+
     }
 }

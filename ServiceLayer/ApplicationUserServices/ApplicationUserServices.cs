@@ -50,7 +50,7 @@ namespace ServiceLayer.ApplicationUserServices
                 return new Response { IsDone = false, Messege = "Failed to update user data." };
             }
             await _context.SaveChangesAsync();
-            var result= _mapper.Map<CompleteUserData>(user);
+            var result= _mapper.Map<CompleteUserDataDTO>(user);
             return new Response { IsDone=true,Model = result , StatusCode=200};
         }
 

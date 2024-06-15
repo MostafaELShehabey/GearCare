@@ -21,12 +21,12 @@ namespace ServiceLayer.WinchDriverService
 
 
         [HttpPost("CompleteWinchData")]
-        public async Task<IActionResult> CompleteWinchData(WinchModel userDto)
+        public async Task<IActionResult> CompleteWinchData(WinchModel userDto,IFormFileCollection WinchlicencePhoto ,IFormFileCollection winchPhoto )
         {
             try
             {
                 var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var providers = await _winchDriverService.CompleteWinchData(userEmail, userDto);
+                var providers = await _winchDriverService.CompleteWinchData(userEmail, userDto , WinchlicencePhoto, winchPhoto);
                 return Ok(providers);
             }
             catch (Exception ex)
@@ -36,67 +36,9 @@ namespace ServiceLayer.WinchDriverService
         }
 
 
-        [HttpPost("AddIDphoto")]
-        public async Task<IActionResult> AddIDphoto(IFormFile photo)
-        {
-            try
-            {
-                var userEmail = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return Unauthorized(new { Message = "User ID not found or empty in token." });
-                }
-
-                var response = await _winchDriverService.AddIDphoto(photo, userEmail);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
 
        
 
-        [HttpPost("AddWinchPhoto")]
-        public async Task<IActionResult> AddWinchPhoto(IFormFile photo)
-        {
-            try
-            {
-                var userEmail = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return Unauthorized(new { Message = "User ID not found or empty in token." });
-                }
-
-                var response = await _winchDriverService.AddWinchPhoto(photo, userEmail);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("AddLicencePhoto")]
-        public async Task<IActionResult> AddLicencePhoto(IFormFile photo )
-        {
-            try
-            {
-                var userEmail = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return Unauthorized(new { Message = "User ID not found or empty in token." });
-                }
-
-                var response = await _winchDriverService.AddLicencePhoto(photo,userEmail);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
 
        
 
@@ -166,7 +108,7 @@ namespace ServiceLayer.WinchDriverService
 
         // Endpoint for updating personal data
         [HttpPut("UpdatePersonalData")]
-        public async Task<IActionResult> UpdatePersonalData([FromBody] WinchDriverDto serviceProviderDto)
+        public async Task<IActionResult> UpdatePersonalData([FromBody] WinchDriverDto serviceProviderDto , IFormFile Personalphoto)
         {
             try
             {
@@ -176,7 +118,7 @@ namespace ServiceLayer.WinchDriverService
                     return Unauthorized(new { Message = "User ID not found or empty in token." });
                 }
 
-                var response = await _winchDriverService.UpdatePersonalData(userEmail, serviceProviderDto);
+                var response = await _winchDriverService.UpdatePersonalData(userEmail, serviceProviderDto, Personalphoto);
                 return Ok(response);
             }
             catch (Exception ex)

@@ -12,8 +12,8 @@ namespace DomainLayer.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
-        public string ?Licence { get; set; }//image
-        public string ?photo { get; set; }//image
+        public List<string> ?Licence { get; set; }//image
+        public List<string> ?photo { get; set; }//image
         public string Model { get; set; }
         public bool Availabile { get; set; } = true;
         //Foreign Keys

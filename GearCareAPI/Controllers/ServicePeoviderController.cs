@@ -24,35 +24,35 @@ namespace GearCareAPI.Controllers
             _technicianService = technicianService;
         }
 
-        [HttpPost("AddIDpicture")]
-        public async Task<IActionResult> AddIDpicture(IFormFile photo)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var result = await _technicianService.AddIDphoto(photo, userEmail);
+        //[HttpPost("AddIDpicture")]
+        //public async Task<IActionResult> AddIDpicture(IFormFile photo)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return BadRequest(ModelState);
+        //        }
+        //        var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //        var result = await _technicianService.AddIDphoto(photo, userEmail);
 
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, $"Internal server error: {ex.Message}");
+        //    }
+        //}
 
 
 
         [HttpPost("CompletePersonalData")]
-        public async Task<IActionResult> CompletePersonalData(ServiceProvideroutDTO userDto)
+        public async Task<IActionResult> CompletePersonalData([FromForm]ServiceProvideroutDTO userDto, IFormFile IDphoto)
         {
             try
             {
                 var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var providers = await _technicianService.CompletePersonalData(userEmail, userDto);
+                var providers = await _technicianService.CompletePersonalData(userEmail, userDto,IDphoto);
                 return Ok(providers);
             }
             catch (Exception ex)
@@ -141,7 +141,7 @@ namespace GearCareAPI.Controllers
         }
 
         [HttpPut("UpdatePersonaldata")]
-        public async Task<IActionResult> UpdatePersonaldata([FromForm] Service_ProviderDto serviceProviderDto)
+        public async Task<IActionResult> UpdatePersonaldata([FromForm] UpdateServiceProviderDataDTO serviceProviderDto,IFormFile personalPhoto)
         {
             try
             {
@@ -157,7 +157,7 @@ namespace GearCareAPI.Controllers
                     return Unauthorized(new { Message = "User ID is empty." });
                 }
 
-                var result = await _technicianService.UpdatePersonaldata(userEmail, serviceProviderDto);
+                var result = await _technicianService.UpdatePersonaldata(userEmail, serviceProviderDto, personalPhoto);
                 if (result != null)
                 {
                     return Ok(new { message = "Personal data updated successfully." });
