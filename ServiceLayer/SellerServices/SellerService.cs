@@ -44,14 +44,13 @@ namespace ServiceLayer.SellerServices
         {
             if (photo == null || photo.Length == 0)
             {
-                throw new InvalidOperationException("The photo is not added");
-            }
+                return new Response { Message = "The photo is not added", StatusCode = 400 , IsDone=false  };          }
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
 
             if (user == null)
             {
-                throw new InvalidOperationException("User not found");
+                return new Response {Message= "User not found", IsDone = false , StatusCode=404 };
             }
 
            
@@ -67,9 +66,7 @@ namespace ServiceLayer.SellerServices
                 // Create new photo entry
                 user.IdPicture = photoPath;
             }
-
             await _context.SaveChangesAsync();
-
 
             var result = _mapper.Map<CompleteSelerData>(user);
             return new Response { IsDone = true, Model = result, StatusCode = 200 };
@@ -93,16 +90,12 @@ namespace ServiceLayer.SellerServices
                     Folder = "ProductPhotos"
                 };
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
                 return uploadResult.Uri.ToString();
             }
-
-
         }
 
         private async Task<string> SaveSellerIDPhotoAsync(IFormFile file)
         {
-
             if (file == null || file.Length == 0)
                 throw new ArgumentNullException("file", "No file uploaded");
 
@@ -114,11 +107,8 @@ namespace ServiceLayer.SellerServices
                     Folder = "SellerID"
                 };
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
                 return uploadResult.Uri.ToString();
             }
-
-
         }
 
 
@@ -128,15 +118,15 @@ namespace ServiceLayer.SellerServices
         {
 
             var sellerId = _context.Users.First(x=>x.Email==userEmail).Id;
-            if (string.IsNullOrWhiteSpace(productDto.Name) && productDto.Price <= 0 && string.IsNullOrWhiteSpace(productDto.Description) && string.IsNullOrWhiteSpace(sellerId))// Logical Error 
+            if (productDto.Name==null && productDto.Price <= 0 && productDto.Description==null && sellerId==null)// Logical Error 
             {
-                return new Response { Messege = "Invalid product or seller information." , StatusCode=400 };
+                return new Response { Message = "Invalid product or seller information." , StatusCode = 404, IsDone = false };
             }
 
             var category = await _context.Categories.AnyAsync(x => x.Id == productDto.CategoryId);
             if(!category)
             {
-                return new Response { IsDone = false ,Messege="Category NOT Found !", StatusCode=404};
+                return new Response { IsDone = false , Message = "Category NOT Found !", StatusCode=404};
             }
             var urls = new List<string>();
             foreach (var photo in images)
@@ -160,12 +150,12 @@ namespace ServiceLayer.SellerServices
             // Ensure the foreign key entities exist in the database before adding the product
             if (!await _context.Users.AnyAsync(u => u.Id == sellerId))
             {
-                throw new Exception("Seller not found");
+                return new Response { Message = "Seller not found", IsDone=false , StatusCode=404};
             }
 
             if (!await _context.Categories.AnyAsync(c => c.Id == productDto.CategoryId))
             {
-                throw new Exception("Category not found");
+                return new Response {Message= "Category not found" , StatusCode = 404 , IsDone=false};
             }
 
             _context.Products.Add(product);
@@ -184,21 +174,21 @@ namespace ServiceLayer.SellerServices
             var seller = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (seller == null)
             {
-                return new Response { Messege = "Seller not found.", StatusCode = 404 };
+                return new Response { Message = "Seller not found.", StatusCode = 404 , IsDone = false };
             }
 
             // Fetch the product
             var product = await _context.Products.Include(p => p.PictureURL).FirstOrDefaultAsync(p => p.Id == productId && p.SellerId == seller.Id);
             if (product == null)
             {
-                return new Response { Messege = "Product not found or you're not authorized.", StatusCode = 404 };
+                return new Response { Message = "Product not found or you're not authorized.", StatusCode = 404 , IsDone=false};
             }
 
             // Check if the photo exists in the product's list of photos
             var photo = product.PictureURL.FirstOrDefault(p => p == photoUrl);
             if (photo == null)
             {
-                return new Response { Messege = "Photo not found in the product.", StatusCode = 404 };
+                return new Response { Message = "Photo not found in the product.", StatusCode = 404 , IsDone = false };
             }
 
             // Remove the photo from the product's list of photos
@@ -211,27 +201,27 @@ namespace ServiceLayer.SellerServices
             // Save changes to the database
             await _context.SaveChangesAsync();
 
-            return new Response { IsDone = true, Messege = "Photo deleted successfully.", StatusCode = 200 };
+            return new Response { IsDone = true, Message = "Photo deleted successfully.", StatusCode = 200 };
         }
 
-        private async Task DeleteFileAsync(string photoUrl)
-        {
-            try
-            {
-                if (File.Exists(photoUrl))
-                {
-                    File.Delete(photoUrl);
-                }
-            }
-            catch (Exception ex)
-            {
+        //private async Task DeleteFileAsync(string photoUrl)
+        //{
+        //    try
+        //    {
+        //        if (File.Exists(photoUrl))
+        //        {
+        //            File.Delete(photoUrl);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
                
-                Console.WriteLine($"Error deleting file: {ex.Message}");
-                throw;
-            }
+        //        Console.WriteLine($"Error deleting file: {ex.Message}");
+        //        throw;
+        //    }
 
-            await Task.CompletedTask;
-        }
+        //    await Task.CompletedTask;
+        //}
 
 
         // Update product
@@ -240,7 +230,7 @@ namespace ServiceLayer.SellerServices
             var product = await _context.Products.FindAsync(productId);
             if (product == null)
             {
-                throw new InvalidOperationException("Product not found.");
+                return new Response  { Message= "Product not found." , StatusCode=404 , IsDone=false};
             }
             _mapper.Map(productDto, product);
             _context.Products.Update(product);
@@ -256,21 +246,21 @@ namespace ServiceLayer.SellerServices
             var product = await _context.Products.FindAsync(productId);
             if (product == null)
             {
-                return new Response { StatusCode = 200, IsDone = true, Messege = "Product not found." };
+                return new Response { StatusCode = 404, IsDone = false, Message = "Product not found." };
             }
             product.deleted = true;
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
-            return new Response { StatusCode = 200, Messege = "Product deleted successfully !" , IsDone= true};
+            return new Response { StatusCode = 200, Message = "Product deleted successfully !" , IsDone= true};
         }
 
         // make discount 
         public async Task<Response> MakeDiscount( DiscountDto discountDto)
         {
 
-            if (discountDto == null)
+            if (discountDto.Persentage == null)
             {
-                return new Response { StatusCode = 200, IsDone = true, Messege = "discount is null !"};
+                return new Response { StatusCode = 404, IsDone = false, Message = "Discount not found !"};
             }
 
             var discount = _mapper.Map<Discount>(discountDto);
@@ -290,11 +280,11 @@ namespace ServiceLayer.SellerServices
 
             if (product == null)
             {
-                throw new InvalidOperationException("Product not found.");
+                return new Response { Message = "Product not found.", StatusCode=404,IsDone=false };
             }
             if (discount == null)
             {
-                throw new InvalidOperationException("Discount not found.");
+                return new Response { Message = "Discount not found." , StatusCode=404,IsDone=false };
             }
 
             // Associate the discount with the product
@@ -306,10 +296,10 @@ namespace ServiceLayer.SellerServices
             // Map the updated product to a ProductDto
             var products = new Product
             {
-
                 Id = productId,
                 Name = product.Name,
                 price = product.price,
+                newPrice = product.price*discount.Persentage,
                 Description = product.Description,
                 Categoryid = product.Categoryid,
                 Discount = new Discount
@@ -331,12 +321,12 @@ namespace ServiceLayer.SellerServices
                                 .FirstOrDefaultAsync(p => p.Id == productId);
             if (product == null)
             {
-                throw new InvalidOperationException("Product not found.");
+                return new Response {Message= "Product not found." , IsDone=false , StatusCode=404};
             }
 
             if (product.Discount == null)
             {
-                return new Response { Messege = "Product has no discount to remove!" , StatusCode = 200 };
+                return new Response { Message = "Product has no discount to remove!" , StatusCode = 404, IsDone = false };
             }
             // Remove the discount from the product
             product.Discount = null;
@@ -352,7 +342,7 @@ namespace ServiceLayer.SellerServices
             var sellerId = _context.Users.First(x => x.Email == userEmail).Id;
             if (string.IsNullOrWhiteSpace(sellerId))
             {
-                throw new ArgumentException("Invalid  seller information.");
+               return  new Response {Message= "Invalid  seller information." , IsDone=false , StatusCode=400};
             }
 
             var products = _context.Products
@@ -376,10 +366,14 @@ namespace ServiceLayer.SellerServices
         //update personal data 
         public async Task<Response> UpdatePersonalData(string userEmail, UpdateSellerDataDTO userDto)
         {
+            if (userDto.Name==null||userDto.PhoneNumber==null||userDto.Location==null)
+            {
+                return new Response { Message = "Complete data to update !" , StatusCode=400, IsDone= false };
+            }
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                return new Response { Messege = "User not found." , StatusCode=200 , IsDone =false};
+                return new Response { Message = "User not found." , StatusCode=404 , IsDone =false};
             }
 
             user.Name = userDto.Name;
@@ -390,7 +384,7 @@ namespace ServiceLayer.SellerServices
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                return new Response { StatusCode = 200, IsDone = false, Messege = "Failed to update user data." };
+                return new Response { StatusCode = 400, IsDone = false, Message = "Failed to update user data." };
             }
 
            var data =  _mapper.Map<CompleteSelerData>(user);
@@ -399,7 +393,11 @@ namespace ServiceLayer.SellerServices
 
         public Response GetMyDiscounts()
         {
-               var result =  _context.discounts.ToList();
+           var result =  _context.discounts.ToList();
+            if (result.Count == 0)
+            {
+                return new Response { Message = "your discount list is impty , Add Discount to Implement "};
+            }
            return new Response { Model = result ,IsDone= true , StatusCode=200};
         }
 

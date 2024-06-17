@@ -18,7 +18,7 @@ namespace DomainLayer.Dto
 
         // public string CarType { get; set; }
 
-        public string IdPicture { get; set; }
+       // public string IdPicture { get; set; }
 
         public string Username { get; set; }
 

@@ -32,7 +32,7 @@ namespace GearCareAPI.Controllers
 
         [HttpPost("AddIDpicture")]
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> AddIDpicture(IFormFile photo)
+        public async Task<IActionResult> AddIDpicture(IFormFile ?photo)
         {
             try
             {
@@ -82,17 +82,17 @@ namespace GearCareAPI.Controllers
         }
 
         [HttpDelete("RemoveProductPhoto")]
-        public async Task<IActionResult> RemoveProductPhoto([FromForm] string productId , string photoUrl)
+        public async Task<IActionResult> RemoveProductPhoto([FromForm] string? productId , string ?photoUrl)
         {
             try
             {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userEmail == null)
                 {
                     return Unauthorized(new { Message = "User ID not found in token." });
                 }
 
-                var userEmail = userIdClaim.Value;
+               
                 if (string.IsNullOrEmpty(userEmail))
                 {
                     return Unauthorized(new { Message = "User ID is empty." });
@@ -112,7 +112,7 @@ namespace GearCareAPI.Controllers
 
         // Update product
         [HttpPut("UpdateProduct/{productId}")]
-        public async Task<IActionResult> UpdateProduct(string productId, [FromBody] ProductDto productDto)
+        public async Task<IActionResult> UpdateProduct(string? productId, [FromBody] ProductDto? productDto)
         {
             if (productDto == null)
             {

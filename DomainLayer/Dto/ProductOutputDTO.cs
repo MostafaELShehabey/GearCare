@@ -14,6 +14,7 @@ namespace DomainLayer.Dto
             public List<string> PictureURL { get; set; }
             [RegularExpression(@"\d+(\.\d{1,2})?")] // make number like 15.00 
             public double Price { get; set; }
+            public double newPrice { get; set; } = 0;
             public string? Description { get; set; }
             //public string SellerId { get; set; }
             public string CategoryId { get; set; }

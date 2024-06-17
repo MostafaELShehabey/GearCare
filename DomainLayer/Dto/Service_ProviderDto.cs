@@ -15,7 +15,7 @@ namespace DomainLayer.Dto
         [Required]
         public string Name { get; set; }
         [Required]
-        public string Number { get; set; }
+        public string PhoneNumber { get; set; }
         public string? EMail { get; set; }
         required
         public string Location { get; set; }

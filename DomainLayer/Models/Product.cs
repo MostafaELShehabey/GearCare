@@ -19,6 +19,7 @@ namespace DomainLayer.Models
         public string Name { get; set; }
         public List<string> ?PictureURL { get; set; }
         public double ?price { get; set; }
+        public double? newPrice { get; set; } = 0;
         public string? Description { get; set; }
         public bool instock { get; set; }
         public bool deleted { get; set; } 

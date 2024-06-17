@@ -103,7 +103,7 @@ namespace ServiceLayer.WinchDriverServise
             var driver = await _userManager.FindByEmailAsync(userEmail);
             if (driver == null)
             {
-                return new Response { IsDone = false, Messege = "User not found." };
+                return new Response { IsDone = false, Message = "User not found.", StatusCode = 404 };
             }
             driver.Spezilization = winchdata.Spezilization;
             var winch =  await _context.Winchs.FirstOrDefaultAsync(x => x.WinchDriver.Id == driver.Id);
@@ -117,7 +117,7 @@ namespace ServiceLayer.WinchDriverServise
 
             if (WinchlicencePhoto.Count() > 1)
             {
-                return   new Response { IsDone = false, Messege= "Add 2 picture , front and back of wich licence ",  StatusCode = 400 };
+                return   new Response { IsDone = false, Message= "Add 2 picture , front and back of wich licence ",  StatusCode = 400 };
             }
 
             var licenceURL = new List<string>();    
@@ -191,13 +191,13 @@ namespace ServiceLayer.WinchDriverServise
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user ID: {userEmail}");
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
             var order = await _context.WinchOrders.FirstOrDefaultAsync(sp => sp.DriverId == user.Id && sp.Id == orderId);
             if (order == null)
             {
-                throw new InvalidOperationException("This user ID or order ID does not exist.");
+                return new Response { Message = "This user ID or order ID does not exist.", StatusCode = 404, IsDone = false };
             }
 
             switch (action)
@@ -219,8 +219,7 @@ namespace ServiceLayer.WinchDriverServise
                     user.available = true;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(action), $"Invalid : {action}");
-            }
+                    return new Response { Message = $"Invalid : {action}", StatusCode = 400, IsDone = false };       }
             await _context.SaveChangesAsync();
             var result = _mapper.Map<WinchDriverDto>(order);
             return new Response { Model = result, StatusCode = 200 };
@@ -235,7 +234,7 @@ namespace ServiceLayer.WinchDriverServise
             var userid = user.Id;
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user ID: {userEmail}");
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
             var myOrder = new List<WinchOrder>();
@@ -260,7 +259,7 @@ namespace ServiceLayer.WinchDriverServise
             var userid = user.Id;
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user ID: {userEmail}");
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
             if (orderBy == Enums.OrderBy.status)
             {
@@ -286,7 +285,7 @@ namespace ServiceLayer.WinchDriverServise
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new InvalidOperationException("User not found for update.");
+                return new Response { Message = "User not found for update.", StatusCode = 404, IsDone = false };
             }
             var winch = _context.Winchs.FirstOrDefault(x => x.DriverId == user.Id);
 
@@ -298,8 +297,7 @@ namespace ServiceLayer.WinchDriverServise
             winch.Model = driverDto.winchModel;
             await _context.SaveChangesAsync();
             var result = _mapper.Map<WinchDriverDto>(user);
-            return new Response { Model = result, StatusCode = 200, Messege = "your data is updated successfully " };
-
+            return new Response { Model = result, StatusCode = 200, Message = "your data is updated successfully " };
         }
 
       
