@@ -7450,11 +7450,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\ServiceLayer.csproj",
+      "projectUniqueName": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\ServiceLayer.csproj",
       "projectName": "ServiceLayer",
-      "projectPath": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\ServiceLayer.csproj",
+      "projectPath": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\ServiceLayer.csproj",
       "packagesPath": "C:\\Users\\Mostafa\\.nuget\\packages\\",
-      "outputPath": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\obj\\",
+      "outputPath": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Mostafa\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -7472,8 +7472,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj": {
-              "projectPath": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj"
+            "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj": {
+              "projectPath": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj"
             }
           }
         }

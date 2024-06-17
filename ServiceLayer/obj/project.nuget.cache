@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "FeLrKCwUQls=",
+  "dgSpecHash": "OW/aLBARdMc=",
   "success": true,
-  "projectFilePath": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\ServiceLayer.csproj",
+  "projectFilePath": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\ServiceLayer\\ServiceLayer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mostafa\\.nuget\\packages\\automapper\\13.0.1\\automapper.13.0.1.nupkg.sha512",
     "C:\\Users\\Mostafa\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",

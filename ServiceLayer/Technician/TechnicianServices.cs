@@ -83,7 +83,7 @@ namespace ServiceLayer.Technician
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                return new Response { IsDone = false, Messege = "User not found." };
+                return new Response { IsDone = false, Message = "User not found." , StatusCode=404};
             }
             user.CarTypeToRepaire=ServiceProvider.CarTypeToRepaire;
             user.Spezilization=ServiceProvider.Spezilization;
@@ -92,7 +92,7 @@ namespace ServiceLayer.Technician
             var finduser = await _userManager.UpdateAsync(user);
             if (!finduser.Succeeded)
             {
-                return new Response { IsDone = false, Messege = "Failed to update user data." };
+                return new Response { IsDone = false, Message = "Failed to update user data." , StatusCode = 404};
             }
             await _context.SaveChangesAsync();
             var result = _mapper.Map<ServiceProvideroutDTO>(user);
@@ -105,7 +105,7 @@ namespace ServiceLayer.Technician
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user ID: {userEmail}");
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}" , StatusCode=404, IsDone=false};
             }
 
             var orders = await _context.RepareOrders
@@ -121,13 +121,14 @@ namespace ServiceLayer.Technician
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user ID: {userEmail}");
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
             var order = await _context.RepareOrders.FirstOrDefaultAsync(sp => sp.ClientId == user.Id && sp.OrderId == orderId);
             if (order == null)
             {
-                throw new InvalidOperationException("This user ID or order ID does not exist.");
+                return new Response { Message = "This user ID or order ID does not exist.", StatusCode = 404, IsDone = false };
+             
             }
 
             switch (action)
@@ -149,7 +150,7 @@ namespace ServiceLayer.Technician
                     user.available = true;
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(action), $"Invalid action: {action}");
+                    return new Response { Message = $"Invalid action: {action}", StatusCode = 400, IsDone=false };
             }
 
             await _context.SaveChangesAsync();
@@ -163,7 +164,7 @@ namespace ServiceLayer.Technician
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user : {userEmail}");
+                return new Response { Message = $"Invalid or non-existent user : {userEmail}", StatusCode = 404, IsDone = false };
             }
 
             user.Name = serviceProviderDto.Name;
@@ -175,7 +176,7 @@ namespace ServiceLayer.Technician
             await _context.SaveChangesAsync();
 
             var result = _mapper.Map<Service_ProviderDto>(user);
-            return new Response { Model = result, StatusCode = 200, Messege = "Your data is updated successfully" };
+            return new Response { Model = result, StatusCode = 200, Message = "Your data is updated successfully" };
         }
 
         public async Task<Response> GetOrderHistory(string userEmail, Enums.OrderBy orderBy)
@@ -183,7 +184,7 @@ namespace ServiceLayer.Technician
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
-                throw new InvalidOperationException($"Invalid or non-existent user ID: {userEmail}");
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
             var query = _context.RepareOrders.Where(x => x.ClientId == user.Id);

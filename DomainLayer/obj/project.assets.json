@@ -2407,11 +2407,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj",
+      "projectUniqueName": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj",
       "projectName": "DomainLayer",
-      "projectPath": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj",
+      "projectPath": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\DomainLayer.csproj",
       "packagesPath": "C:\\Users\\Mostafa\\.nuget\\packages\\",
-      "outputPath": "G:\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\obj\\",
+      "outputPath": "F:\\رابعة حاسبات_4\\الترم التاني\\Graduation project\\GearCareBackend\\GearCare\\DomainLayer\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Mostafa\\AppData\\Roaming\\NuGet\\NuGet.Config",

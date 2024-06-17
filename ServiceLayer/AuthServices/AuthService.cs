@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ServiceLayer.AuthServices
 {
@@ -36,7 +37,7 @@ namespace ServiceLayer.AuthServices
             RoleManager<IdentityRole> roleManage,
             IMapper mapper,
             IOptions<JWT> jwt,
-            IHttpContextAccessor httpContextAccessor ,
+            IHttpContextAccessor httpContextAccessor,
             IOptions<CloudinarySettings> config)
         {
             this._userManager = userManager;
@@ -55,7 +56,7 @@ namespace ServiceLayer.AuthServices
             _cloudinary = new Cloudinary(acc);
 
         }
-        public async Task<AuthModel> RegisterAsync(ApplicationUserRegisterDTO appUserDto,IFormFile? photo)
+        public async Task<AuthModel> RegisterAsync(ApplicationUserRegisterDTO appUserDto, IFormFile? photo)
         {
             try
             {
@@ -67,8 +68,8 @@ namespace ServiceLayer.AuthServices
 
                 string role = appUserDto.UserType.ToString();
 
-                var roleExist = _context.Roles.Where(x=>x.NormalizedName==role.Normalize());
-                if(roleExist== null)
+                var roleExist = _context.Roles.Where(x => x.NormalizedName == role.Normalize());
+                if (roleExist == null)
                 {
                     return new AuthModel { Message = "Role not Exist , add role first " };
 
@@ -87,14 +88,15 @@ namespace ServiceLayer.AuthServices
                 {
                     return new AuthModel { Message = "Email is already register ! " };
                 }
-                
+
                 var user = _mapper.Map<ApplicationUser>(appUserDto);
                 user.UserType = appUserDto.UserType;
                 if (photo == null)
                 {
                     user.PhotoId = "https://res.cloudinary.com/dzyzohlli/image/upload/v1718175218/Default_Photo/kojfrcqeng2gglbvsrht.png";
                 }
-                else {
+                else
+                {
                     user.PhotoId = await SavePersonalPhotoAsync(photo);
                 }
                 var result = await _userManager.CreateAsync(user, appUserDto.Password);
@@ -110,36 +112,36 @@ namespace ServiceLayer.AuthServices
                 await _userManager.AddToRoleAsync(user, role);
 
                 var jwtSecurityToken = await CreateJwtToken(user);
-               return new AuthModel
-               {
+                return new AuthModel
+                {
                     ExpiresOn = jwtSecurityToken.ValidTo,
                     User = _mapper.Map<CompleteUserDataDTO>(user),
                     IsAuthenticated = true,
-                    Roles = new List<string> {role },
+                    Roles = new List<string> { role },
                     Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-               };
+                };
 
-        }
+            }
             catch (Exception ex)
             {
                 return new AuthModel { Message = $"An error occurred during registration.{ex.InnerException}" };
             }
         }
 
-        public async Task<AuthModel> GetJwtToken(LoginDto Dto) 
+        public async Task<AuthModel> GetJwtToken(LoginDto Dto)
         {
             var authmodel = new AuthModel();
             var user = await _userManager.FindByNameAsync(Dto.username);
-            var pass = await _userManager.CheckPasswordAsync(user,Dto.password);
+            var pass = await _userManager.CheckPasswordAsync(user, Dto.password);
             if (user is null || !pass)
             {
                 authmodel.Message = "Username Or Password is incorrect CHeck YOU Credantials ";
             }
             var jwtSecurityToken = await CreateJwtToken(user);
             var rolesList = await _userManager.GetRolesAsync(user);
-            authmodel.Roles=rolesList.ToList();
+            authmodel.Roles = rolesList.ToList();
             authmodel.IsAuthenticated = true;
-            authmodel.User=_mapper.Map<CompleteUserDataDTO>(user);
+            authmodel.User = _mapper.Map<CompleteUserDataDTO>(user);
             authmodel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authmodel.ExpiresOn = jwtSecurityToken.ValidTo;
             return authmodel;
@@ -153,23 +155,23 @@ namespace ServiceLayer.AuthServices
             {
                 return "User id or Role is not Valid !";
             }
-            if(await _userManager.IsInRoleAsync(user,model.Role)) 
+            if (await _userManager.IsInRoleAsync(user, model.Role))
             {
                 return "User is already assiged to this Role!";
             }
-            var result = await _userManager.AddToRoleAsync(user,model.Role);
+            var result = await _userManager.AddToRoleAsync(user, model.Role);
             return result.Succeeded ? String.Empty : "Something went wrong please try again ! ";
 
         }
 
 
-        public  async Task<JwtSecurityToken>CreateJwtToken(ApplicationUser user)
+        public async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
             var roles = await _userManager.GetRolesAsync(user);
             var roleclaims = new List<Claim>();
             foreach (var role in roles)
-                roleclaims.Add(new Claim("roles",role));
+                roleclaims.Add(new Claim("roles", role));
 
             var Claims = new[]
             {
@@ -181,44 +183,44 @@ namespace ServiceLayer.AuthServices
             .Union(roleclaims);
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
-            var signingCredentials = new SigningCredentials(symmetricSecurityKey,SecurityAlgorithms.HmacSha256);
+            var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
 
             var jwtSecurityToken = new JwtSecurityToken(
                 issuer: _jwt.Issuer,
                 audience: _jwt.Audience,
                 claims: Claims,
                 expires: DateTime.Now.AddDays(_jwt.DurationInDays),
-                signingCredentials:signingCredentials
+                signingCredentials: signingCredentials
                 );
             return jwtSecurityToken;
         }
 
 
-              public  async Task<AuthModel> LoginAsync(LoginDto loginDto)
-              {
-                    var user = await _userManager.FindByNameAsync(loginDto.username);
-                    if (user == null)
-                    {
-                        return new AuthModel { Message = "Invalid Username or Password!" };
-                    }
+        public async Task<AuthModel> LoginAsync(LoginDto loginDto)
+        {
+            var user = await _userManager.FindByNameAsync(loginDto.username);
+            if (user == null)
+            {
+                return new AuthModel { Message = "Invalid Username or Password!" };
+            }
 
-                    var result = await _userManager.CheckPasswordAsync(user, loginDto.password);
-                    if (!result)
-                    {
-                        return new AuthModel { Message = "Invalid Email or Password!" };
-                    }
+            var result = await _userManager.CheckPasswordAsync(user, loginDto.password);
+            if (!result)
+            {
+                return new AuthModel { Message = "Invalid Email or Password!" };
+            }
 
-                    var token = await CreateJwtToken(user);
-                    var roles =await _userManager.GetRolesAsync(user);
-                    return new AuthModel
-                    {
-                        IsAuthenticated = true,
-                        Token = new JwtSecurityTokenHandler().WriteToken(token),
-                        User = _mapper.Map<CompleteUserDataDTO>(user),
-                        ExpiresOn = token.ValidTo,
-                        Roles = roles.ToList()
-                    };
-              }
+            var token = await CreateJwtToken(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            return new AuthModel
+            {
+                IsAuthenticated = true,
+                Token = new JwtSecurityTokenHandler().WriteToken(token),
+                User = _mapper.Map<CompleteUserDataDTO>(user),
+                ExpiresOn = token.ValidTo,
+                Roles = roles.ToList()
+            };
+        }
 
 
 
@@ -296,12 +298,26 @@ namespace ServiceLayer.AuthServices
             return authModel;
         }
 
-       
 
 
+        public async Task<AuthModel> ChangeUserPhoto(IFormFile photo,string userEmail)
+        {
+            var user =await _context.Users.FindAsync(userEmail);
+            if (user == null) { 
+            return new AuthModel { Message="user not found !, try to login" , IsAuthenticated=false};
+            }
+            user.PhotoId = await SavePersonalPhotoAsync(photo);
+            _context.SaveChanges();
+            var result = _mapper.Map<CompleteUserDataDTO>(user);
+            return new AuthModel
+            {
+                IsAuthenticated = true,
+                Message="photo has updated successfuly.",
+                User = user
 
+            };
+        }
 
     }
-
 }
 

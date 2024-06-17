@@ -13,8 +13,9 @@ namespace ServiceLayer.AuthServices
     public interface IAuthService
     {
         public Task<AuthModel> RegisterAsync(ApplicationUserRegisterDTO appUserDto, IFormFile ?photo);
-       // public Task<ApplicationUserDto> AddPersonalphoto(IFormFile photo, string userid);
-        public  Task<AuthModel> LoginAsync(LoginDto loginDto);
+        public Task<AuthModel> ChangeUserPhoto(IFormFile photo, string userEmail);
+
+        public Task<AuthModel> LoginAsync(LoginDto loginDto);
         public Task<AuthModel> ChangePasswordAsync(ChangepasswordDTO model);
         public Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user);
         public Task<AuthModel> GetJwtToken(LoginDto Dto);

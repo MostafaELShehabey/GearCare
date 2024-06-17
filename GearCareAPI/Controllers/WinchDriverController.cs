@@ -21,7 +21,7 @@ namespace ServiceLayer.WinchDriverService
 
 
         [HttpPost("CompleteWinchData")]
-        public async Task<IActionResult> CompleteWinchData(WinchModel userDto,IFormFileCollection WinchlicencePhoto ,IFormFileCollection winchPhoto )
+        public async Task<IActionResult> CompleteWinchData([FromForm] WinchModel userDto,IFormFileCollection WinchlicencePhoto ,IFormFileCollection winchPhoto )
         {
             try
             {
@@ -34,13 +34,6 @@ namespace ServiceLayer.WinchDriverService
                 return StatusCode(500, $"internal server error  {ex.InnerException}");
             }
         }
-
-
-
-       
-
-
-       
 
 
         // Endpoint for handling order actions (accept, refuse, cancel)

@@ -87,3 +87,21 @@ G:\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLa
 G:\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.pdb
 G:\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.genruntimeconfig.cache
 G:\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ref\ServiceLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\bin\Debug\net8.0\ServiceLayer.deps.json
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\bin\Debug\net8.0\ServiceLayer.runtimeconfig.json
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\bin\Debug\net8.0\ServiceLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\bin\Debug\net8.0\ServiceLayer.pdb
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\bin\Debug\net8.0\DomainLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\bin\Debug\net8.0\DomainLayer.pdb
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.AssemblyReference.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.GeneratedMSBuildEditorConfig.editorconfig
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfoInputs.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.AssemblyInfo.cs
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.csproj.CoreCompileInputs.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.sourcelink.json
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceL.3037F684.Up2Date
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\refint\ServiceLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.pdb
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ServiceLayer.genruntimeconfig.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\ServiceLayer\obj\Debug\net8.0\ref\ServiceLayer.dll
