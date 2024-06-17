@@ -106,7 +106,6 @@ namespace GearCareAPI.Controllers
 
 
         [HttpPost("ChangePassword")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> ChangePasswordAsync(ChangepasswordDTO ?model)
         {
             if (ModelState.IsValid)

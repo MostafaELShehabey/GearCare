@@ -115,13 +115,15 @@ namespace ServiceLayer.WinchDriverServise
                 winchphotoURL.Add(photopath);
             }
 
-            if (WinchlicencePhoto.Count() > 1)
+
+
+            if (WinchlicencePhoto.Count() != 2)
             {
-                return   new Response { IsDone = false, Message= "Add 2 picture , front and back of wich licence ",  StatusCode = 400 };
+                return new Response { IsDone = false, Message = "Please add exactly 2 pictures: front and back of the winch license.", StatusCode = 400 };
             }
 
             var licenceURL = new List<string>();    
-            for (int i = 0; i <=1;i++)
+            for (int i = 0; i <=2;i++)
             {
                 var photopath = await WinchlicencePhotos(WinchlicencePhoto[i]);
                 licenceURL.Add(photopath);
@@ -134,12 +136,12 @@ namespace ServiceLayer.WinchDriverServise
                 Availabile = true,
                 Licence = licenceURL,
                 photo = winchphotoURL
-
             };
 
             await _context.Winchs.AddAsync(data);
             await _context.SaveChangesAsync();
             var result = _mapper.Map<WinchOutputDTO>(data);
+            result.Spezilization = driver.Spezilization;
             return new Response { IsDone = true,Model = result, StatusCode =200};
         }
 
