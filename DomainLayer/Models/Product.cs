@@ -15,7 +15,7 @@ namespace DomainLayer.Models
         //PrimaryKey
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        public string Id { get; set; }
+        public string Id { get; set; } 
         public string Name { get; set; }
         public List<string> ?PictureURL { get; set; }
         public double ?price { get; set; }

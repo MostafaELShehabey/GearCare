@@ -258,22 +258,22 @@ namespace ServiceLayer.AuthServices
 
         public async Task<AuthModel> ChangePasswordAsync(ChangepasswordDTO changePasswordDto)
         {
-            var authModel = new AuthModel();
+            //var authModel = new AuthModel();
 
             //// Get the current user ID from the HttpContext
             var userEmail = _contextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userEmail))
             {
-                authModel.Message = "User is not authenticated.";
-                return authModel;
+                return new AuthModel { Message = "User is not authenticated." , IsAuthenticated= false};
+               
             }
 
             // var userId = GetCurrentUserASync();         
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                authModel.Message = "User not found.";
-                return authModel;
+                return new AuthModel { Message = "User not found." };
+                
             }
 
             // Change the user's password
@@ -282,20 +282,17 @@ namespace ServiceLayer.AuthServices
             _context.SaveChanges();
             if (!result.Succeeded)
             {
-                authModel.Message = "Password change failed. " + string.Join(", ", result.Errors.Select(e => e.Description));
-                return authModel;
+                return new AuthModel { Message = "Password change failed. " + string.Join(", ", result.Errors.Select(e => e.Description))};
             }
 
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
             {
-                authModel.Message = "the new password doesnt saves ! ";
-                return authModel;
+               return new AuthModel { Message = "the new password doesnt saves ! " };
+               
             }
 
-            authModel.IsAuthenticated = true;
-            authModel.Message = "Password changed successfully.";
-            return authModel;
+            return new AuthModel { IsAuthenticated = true, Message = "Password changed successfully." };
         }
 
 
@@ -314,7 +311,6 @@ namespace ServiceLayer.AuthServices
                 IsAuthenticated = true,
                 Message="photo has updated successfuly.",
                 User = user
-
             };
         }
 

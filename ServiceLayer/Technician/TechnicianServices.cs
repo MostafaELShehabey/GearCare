@@ -78,12 +78,21 @@ namespace ServiceLayer.Technician
             }
         }
 
-        public async Task<Response> CompletePersonalData(string userEmail, ServiceProvideroutDTO ServiceProvider,IFormFile IDphoto)
+        public async Task<Response> CompletePersonalData(string userEmail, ServiceProvideroutDTO? ServiceProvider,IFormFile? IDphoto)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
                 return new Response { IsDone = false, Message = "User not found." , StatusCode=404};
+            } 
+            if (IDphoto == null)
+            {
+                return new Response { IsDone = false, Message = " ID picture is required ." , StatusCode=404};
+            } 
+            
+            if (ServiceProvider.CarTypeToRepaire == null||ServiceProvider.Spezilization.Count()==0)
+            {
+                return new Response { IsDone = false, Message = " ar type and specilization are required " , StatusCode=404};
             }
             user.CarTypeToRepaire=ServiceProvider.CarTypeToRepaire;
             user.Spezilization=ServiceProvider.Spezilization;

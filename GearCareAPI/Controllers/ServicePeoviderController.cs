@@ -47,7 +47,7 @@ namespace GearCareAPI.Controllers
 
 
         [HttpPost("CompletePersonalData")]
-        public async Task<IActionResult> CompletePersonalData([FromForm]ServiceProvideroutDTO userDto, IFormFile IDphoto)
+        public async Task<IActionResult> CompletePersonalData([FromForm]ServiceProvideroutDTO ?userDto, IFormFile ?IDphoto)
         {
             try
             {
