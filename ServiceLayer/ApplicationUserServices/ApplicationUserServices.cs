@@ -74,7 +74,7 @@ namespace ServiceLayer.ApplicationUserServices
                     var serviceProviderQuery = _context.Users
                             .Where(sp => sp.UserType == userType && (
                              EF.Functions.Like(sp.Location, $"%{location}%") ||
-                             EF.Functions.Like(sp.CarTypeToRepaire, $"%{Cartype}%")) &&
+                               sp.CarTypeToRepaire.Any(ct => EF.Functions.Like(ct, $"%{Cartype}%"))) &&
                                          sp.available)
                             .OrderBy(o => o.Location)
                             .ThenBy(o => o.Rate)
@@ -98,7 +98,7 @@ namespace ServiceLayer.ApplicationUserServices
                     var serviceProviderQuery = _context.Users
                                .Where(sp => sp.UserType == userType && (
                                 EF.Functions.Like(sp.Location, $"%{location}%") ||
-                                EF.Functions.Like(sp.CarTypeToRepaire, $"%{Cartype}%")) &&
+                               sp.CarTypeToRepaire.Any(ct=> EF.Functions.Like(ct, $"%{Cartype}%"))) &&
                                             sp.available)
                                .OrderBy(o => o.Location)
                                .ThenBy(o => o.Rate)

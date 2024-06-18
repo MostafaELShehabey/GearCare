@@ -13,3 +13,18 @@ G:\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLay
 G:\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.pdb
 G:\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.genruntimeconfig.cache
 G:\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\ref\DomainLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\bin\Release\net8.0\DomainLayer.deps.json
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\bin\Release\net8.0\DomainLayer.runtimeconfig.json
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\bin\Release\net8.0\DomainLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\bin\Release\net8.0\DomainLayer.pdb
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.csproj.AssemblyReference.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.GeneratedMSBuildEditorConfig.editorconfig
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.AssemblyInfoInputs.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.AssemblyInfo.cs
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.csproj.CoreCompileInputs.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.sourcelink.json
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\refint\DomainLayer.dll
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.pdb
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\DomainLayer.genruntimeconfig.cache
+F:\رابعة حاسبات_4\الترم التاني\Graduation project\GearCareBackend\GearCare\DomainLayer\obj\Release\net8.0\ref\DomainLayer.dll

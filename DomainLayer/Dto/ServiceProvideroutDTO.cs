@@ -10,7 +10,7 @@ namespace DomainLayer.Dto
     public class ServiceProvideroutDTO
     {
         public List<string> ?Spezilization { get; set; }
-        public string ?CarTypeToRepaire { get; set; }
+        public List<string> ?CarTypeToRepaire { get; set; }
       
     }
 }
