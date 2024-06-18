@@ -34,7 +34,7 @@ namespace DomainLayer.Models
        // public string? IdPhoto { get; set; } = null;
         public bool available { get; set; } = true;
         public List<string>? Spezilization { get; set; }= new List<string>();
-        public string? CarTypeToRepaire { get; set; } = null;
+        public List<string>? CarTypeToRepaire { get; set; } = null;
 
        
         //navigation properity 

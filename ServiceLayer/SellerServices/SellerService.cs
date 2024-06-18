@@ -299,7 +299,7 @@ namespace ServiceLayer.SellerServices
                 Id = productId,
                 Name = product.Name,
                 price = product.price,
-                newPrice = product.price*discount.Persentage,
+                newPrice = (product.price*discount.Persentage)/100,
                 Description = product.Description,
                 Categoryid = product.Categoryid,
                 Discount = new Discount
@@ -330,6 +330,7 @@ namespace ServiceLayer.SellerServices
             }
             // Remove the discount from the product
             product.Discount = null;
+            product.newPrice = 0;
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
            var result = _mapper.Map<ProductOutputDTO>(product);
