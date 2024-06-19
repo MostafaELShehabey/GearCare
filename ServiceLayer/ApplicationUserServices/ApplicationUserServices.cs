@@ -158,13 +158,11 @@ namespace ServiceLayer.ApplicationUserServices
         }
 
 
-
-
-
         //get all product (randoum )
         public async Task<Response> GetAllProducts(string? search) // search by names ( Name , Category Name )
         {
-            var query =  _context.Products.AsQueryable();
+            
+            var query =  _context.Products.Include(x=>x.Seller).AsQueryable();
             // filter products based on name, price, or category
             if (!string.IsNullOrEmpty(search))
             {
@@ -175,20 +173,78 @@ namespace ServiceLayer.ApplicationUserServices
                     p.Description.ToLower().Contains(search) ||
                     p.Categorys.Name.ToLower().Contains(search));   
 
-                var result = await query.ToListAsync();
-                if (!result.Any())
+                var products = await query.ToListAsync();
+
+                if (!products.Any())
                 {
                     return new Response { IsDone = false, Message = "the product not Exit , try to search with differnt Name or Category ! ", StatusCode = 404 };
                 }
-                return new Response { IsDone = true, Model = result, StatusCode = 200 };
+
+
+                 var productDto = products.Select(p => new NewProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    PictureURL = p.PictureURL,
+                    Price = p.price,
+                    NewPrice = p.newPrice,
+                    Description = p.Description,
+                    InStock = p.instock,
+                    SellerId = p.SellerId,
+                    CategoryId = p.Categoryid,
+                    Seller = new SellerDto
+                    {
+                        Id = p.Seller.Id,
+                        Name = p.Seller.Name,
+                        Location = p.Seller.Location,
+                        PhotoId = p.Seller.PhotoId,
+                        Available = p.Seller.available,
+                        NumberOfRates = p.Seller.NumberOfRates,
+                        Rate = p.Seller.Rate,
+                        Specialization = p.Seller.Spezilization,
+                        UserType = p.Seller.UserType
+                    },
+                    Category = p.Categorys,
+                    Discount = p.Discount
+                }).ToList();
+
+                return new Response { IsDone = true, Model = products, StatusCode = 200 };
             }
             else
             {
                 // Shuffle the products randomly
                 // Fetch the data into memory and then order it randomly
-                // Fetch data into memory
-                var product = await query.OrderBy(p => Guid.NewGuid()).ToListAsync();// Shuffle in memory
-                return new Response { IsDone = true, Model = query ,StatusCode=200};
+                var products = await query.ToListAsync();
+                var shuffledProducts = products.OrderBy(p => Guid.NewGuid()).ToList();
+
+                var productDto = shuffledProducts.Select(p => new NewProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    PictureURL = p.PictureURL,
+                    Price = p.price,
+                    NewPrice = p.newPrice,
+                    Description = p.Description,
+                    InStock = p.instock,
+                    SellerId = p.SellerId,
+                    CategoryId = p.Categoryid,
+                    Seller = new SellerDto
+                    {
+                        Id = p.Seller.Id,
+                        Name = p.Seller.Name,
+                        Location = p.Seller.Location,
+                        PhotoId = p.Seller.PhotoId,
+                        Available = p.Seller.available,
+                        NumberOfRates = p.Seller.NumberOfRates,
+                        Rate = p.Seller.Rate,
+                        Specialization = p.Seller.Spezilization,
+                        UserType = p.Seller.UserType
+                    },
+                    Category = p.Categorys,
+                    Discount = p.Discount
+                }).ToList();
+
+                return new Response { IsDone = true, Model = productDto, StatusCode = 200 };
             }
         }
 

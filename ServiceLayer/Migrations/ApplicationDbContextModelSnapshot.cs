@@ -152,7 +152,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Discount", b =>
@@ -166,7 +166,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("discounts");
+                    b.ToTable("discounts", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Photo", b =>
@@ -187,7 +187,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("productID");
 
-                    b.ToTable("photos");
+                    b.ToTable("photos", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Product", b =>
@@ -236,7 +236,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Product_Shoppingcart", b =>
@@ -259,7 +259,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("ShoppingcartId");
 
-                    b.ToTable("product_Shoppingcarts");
+                    b.ToTable("product_Shoppingcarts", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.RepareOrder", b =>
@@ -290,7 +290,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("ClientId");
 
-                    b.ToTable("RepareOrders");
+                    b.ToTable("RepareOrders", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.ShoppingCart", b =>
@@ -315,7 +315,7 @@ namespace ServiceLayer.Migrations
                     b.HasIndex("ClientId")
                         .IsUnique();
 
-                    b.ToTable("ShoppingCarts");
+                    b.ToTable("ShoppingCarts", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Winch", b =>
@@ -343,7 +343,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Winchs");
+                    b.ToTable("Winchs", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.WinchDriver", b =>
@@ -381,7 +381,7 @@ namespace ServiceLayer.Migrations
                     b.HasIndex("winchId")
                         .IsUnique();
 
-                    b.ToTable("WinchDrivers");
+                    b.ToTable("WinchDrivers", (string)null);
                 });
 
             modelBuilder.Entity("DomainLayer.Models.WinchOrder", b =>
@@ -416,7 +416,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("wichClient");
 
-                    b.ToTable("WinchOrders");
+                    b.ToTable("WinchOrders", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

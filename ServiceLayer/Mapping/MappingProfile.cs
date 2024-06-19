@@ -18,6 +18,7 @@ namespace ServiceLayer.Mapping
             CreateMap<CompleteUserDataDTO, ApplicationUser>().ReverseMap();
             CreateMap<CompleteSelerData, ApplicationUser>().ReverseMap();
             CreateMap<ApplicationUser, ServiceProvideroutDTO>().ReverseMap();
+            CreateMap<ApplicationUser, SellerOutDTO>().ReverseMap();
 
             CreateMap<RepareOrderDto, RepareOrder>().ReverseMap();
             CreateMap<RepareOrderToAccept, RepareOrder>().ReverseMap();

@@ -70,22 +70,22 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseExceptionHandler(appBuilder =>
-{
-    appBuilder.Run(async context =>
-    {
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-        context.Response.ContentType = "application/json";
-        var error = context.Features.Get<IExceptionHandlerFeature>();
-        if (error != null)
-        {
-            var ex = error.Error;
+//app.UseExceptionHandler(appBuilder =>
+//{
+//    appBuilder.Run(async context =>
+//    {
+//        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+//        context.Response.ContentType = "application/json";
+//        var error = context.Features.Get<IExceptionHandlerFeature>();
+//        if (error != null)
+//        {
+//            var ex = error.Error;
 
-            var result = JsonConvert.SerializeObject(new { message = ex.Message });
-            await context.Response.WriteAsync(result);
-        }
-    });
-});
+//            var result = JsonConvert.SerializeObject(new { message = ex.Message });
+//            await context.Response.WriteAsync(result);
+//        }
+//    });
+//});
 
 app.MapControllers();
 
