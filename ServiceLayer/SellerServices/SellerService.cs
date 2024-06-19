@@ -117,8 +117,10 @@ namespace ServiceLayer.SellerServices
         public async Task<Response> AddProduct(ProductDto? productDto,IFormFileCollection images ,string userEmail)
         {
 
-            var sellerId = _context.Users.First(x=>x.Email==userEmail).Id;
-            if (productDto.Name==null && productDto.Price <= 0 && productDto.Description==null && sellerId==null)// Logical Error 
+            var seller = _context.Users.First(x=>x.Email==userEmail);
+
+            var sellerId = seller.Id;
+            if (productDto.Name==null || productDto.Price <= 0 || productDto.Description==null || sellerId==null)// Logical Error 
             {
                 return new Response { Message = "Invalid product or seller information." , StatusCode = 404, IsDone = false };
             }
@@ -135,6 +137,8 @@ namespace ServiceLayer.SellerServices
                 urls.Add(photoPath);
             }
 
+           
+            
             var product = new Product
             { 
                 Name = productDto.Name,
@@ -143,6 +147,7 @@ namespace ServiceLayer.SellerServices
                 PictureURL = urls,
                 SellerId = sellerId,
                 Categoryid = productDto.CategoryId,
+                Seller= seller,
                 instock = true,
                 deleted = false,
                 Discount = null

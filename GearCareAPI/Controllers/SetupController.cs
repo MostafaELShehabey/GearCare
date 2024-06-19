@@ -32,6 +32,17 @@ namespace GearCareAPI.Controllers
             _mapper = mapper;
         }
 
+        //get all user 
+        [HttpGet]
+        [Route("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            // var users = await _userManager.Users.ToListAsync();
+            var users = await _context.Users.ToListAsync();
+            return Ok(users);
+        }
+
+
         [HttpGet("GetAllRoles")]
         public IActionResult GetAllRoles()
         {
@@ -63,16 +74,8 @@ namespace GearCareAPI.Controllers
             return BadRequest(new { error = "Role already exist" });
         }
 
-        // Get all users
-        [HttpGet]
-        [Route("GetAllUsers")]
-        public async Task<IActionResult> GetAllUsers()
-        {
-           // var users = await _userManager.Users.ToListAsync();
-            var users = await _context.Users.ToListAsync();
-            return Ok(users);
-        }
-
+        // Get all user
+       
         [HttpPost("AddCategory")]
 
         public async Task<IActionResult> AddCategories(CategoryDto categoryDto)
