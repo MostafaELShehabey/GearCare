@@ -19,8 +19,12 @@ namespace ServiceLayer.Mapping
             CreateMap<CompleteSelerData, ApplicationUser>().ReverseMap();
             CreateMap<ApplicationUser, ServiceProvideroutDTO>().ReverseMap();
             CreateMap<ApplicationUser, SellerOutDTO>().ReverseMap();
+            CreateMap<ApplicationUser, SellerDto>().ReverseMap();
 
-            CreateMap<RepareOrderDto, RepareOrder>().ReverseMap();
+           CreateMap<RepareOrderDto, RepareOrder>().ReverseMap();
+            CreateMap<RepaireOrderOutDto, RepareOrder>()
+               // .ForMember(dest => dest.Client, opt => opt.Ignore()) // Example: Ignore Client property if not mapping correctly
+                .ReverseMap();
             CreateMap<RepareOrderToAccept, RepareOrder>().ReverseMap();
 
             CreateMap<CategoryDto,Category>().ReverseMap();

@@ -14,22 +14,27 @@ namespace DomainLayer.Models
     public class RepareOrder
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]   
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string OrderId { get; set; }
+        public string cartype {  get; set; }
+        public string location { get; set; }
+        public string ProblemDescription { get; set; }
 
-        [ForeignKey("ClientId")]
+
+      //  [ForeignKey("ClientId")]
         public string ClientId { get; set; }
-        public double Price { get; set; }
+       
+        
+         public string ServiceProviderId { get; set; }
+
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public DateTime ?Date { get; set; }
 
-        public string ProblemDescription { get; set; }
-
         public Status Status { get; set; }
 
         //Navigation Properity 
-        public ApplicationUser Client { get; set; }
+        public RepareOrder_ApplicationUser? User { get; set; }
 
 
     }

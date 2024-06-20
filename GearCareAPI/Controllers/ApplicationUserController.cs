@@ -81,8 +81,8 @@ namespace GearCareAPI.Controllers
         {
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var order = await _applicationUserService.CreateRepareOrder(userId ,repareOrderDto);
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var order = await _applicationUserService.CreateRepareOrder(userEmail, repareOrderDto);
                 return Ok(order);
             }
             catch (Exception ex)

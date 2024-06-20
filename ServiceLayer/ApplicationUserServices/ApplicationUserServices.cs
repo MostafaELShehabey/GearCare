@@ -133,27 +133,31 @@ namespace ServiceLayer.ApplicationUserServices
         }
 
         // create repare order 
-        public async Task<Response> CreateRepareOrder(string clintId , RepareOrderDto repareOrderDto)
+        public async Task<Response> CreateRepareOrder(string userEmail, RepareOrderDto repareOrderDto)
         {
             // select a technician to send him a request 
-            var user = await _context.Users.Where(x => x.Id == repareOrderDto.ServiceProvierId).FirstAsync();
+            var user= await _userManager.FindByEmailAsync(userEmail);
+            var serviceProvider = await _context.Users.Where(x => x.Id == repareOrderDto.ServiceProvierId).FirstAsync();
             if (user is  null)
             {
                 return new Response { Message = $"User with ID {repareOrderDto.ServiceProvierId} was not found." , StatusCode=404, IsDone= false };
             }
             var repareOrder = new RepareOrder
             {
-                ClientId = repareOrderDto.ServiceProvierId,
+                ClientId = user.Id,
                 Date = DateTime.Now,
-                Price = repareOrderDto.Price,
                 Status = Status.PendingApproval,
+                cartype = repareOrderDto.cartype,
+                location = repareOrderDto.location,
                 ProblemDescription = repareOrderDto.ProblemDescription,
-                Client = user
+                ServiceProviderId = serviceProvider.Id,
+                //Client = serviceProvider
+
             };
-            repareOrder.ClientId = repareOrderDto.ServiceProvierId;
-            _context.RepareOrders.Add(repareOrder);
+
+            await _context.RepareOrders.AddAsync(repareOrder);
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<RepareOrderDto>(repareOrder);
+            var result = _mapper.Map<RepaireOrderOutDto>(repareOrder);
             return new Response { IsDone=true,Model = result,StatusCode=200};
         }
 

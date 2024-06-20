@@ -14,10 +14,10 @@ namespace DomainLayer.Dto
     {
         
         public string ServiceProvierId { get; set; }
-
-        public double Price { get; set; }
-
+        public string cartype { get; set; }
+        public string location { get; set; }
         public string ProblemDescription  { get; set; }
+        
       
 
     }
