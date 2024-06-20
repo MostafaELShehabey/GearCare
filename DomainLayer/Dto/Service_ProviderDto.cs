@@ -11,7 +11,7 @@ namespace DomainLayer.Dto
 {
     public class Service_ProviderDto
     {
-        //public string id {  get; set; }
+        public string id {  get; set; }
         [Required]
         public string Name { get; set; }
         [Required]

@@ -95,25 +95,34 @@ namespace ServiceLayer.AdminServices
         // Get All Repair Orders Async
         public async Task<List<RepareOrderDto>> GetAllRepairOrdersAsync(Status statusType, string search, int page, int pageSize)
         {
-            var query = await _context.RepareOrders.Include(x => x.Client)
-                                             .Where(ro => ro.Status == statusType)
-                                                 .ToListAsync();
+            var query = _context.RepairOrder_ApplicationUsers
+                    .Include(x => x.applicationUsers)
+                    .ThenInclude(ro => ro.RepairOrder)
+                      .Where(ro => ro.repareOrders.Any(o => o.Status == statusType));
+            
             var  stateus = statusType.ToString();
             if (!string.IsNullOrEmpty(stateus))
             {
-                query = query.Where(ro =>
-                    ro.Client.Name.Contains(search) ||
-                    ro.Client.PhoneNumber.Contains(search) ||
-                    ro.Client.CarType.Contains(search) ||
-                    ro.Client.Email.Contains(search) ||
-                    ro.Client.Location.Contains(search)
-                ).ToList();
+                if (!string.IsNullOrEmpty(search))
+                {
+                    query = query.Where(ro =>
+                        ro.applicationUsers.Any(o =>
+                            o.Name.Contains(search) ||
+                            o.PhoneNumber.Contains(search) ||
+                            o.CarType.Contains(search) ||
+                            o.Email.Contains(search) ||
+                            o.Location.Contains(search)
+                        ));
+                }
             }
-            var repairOrders = query.Skip((page - 1) * pageSize)
-                                     .Take(pageSize)
-                                     .ToList();
-            var serviceProviderDtos = _mapper.Map<List<RepareOrderDto>>(repairOrders);
-            return serviceProviderDtos;
+            var repairOrders = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .SelectMany(ro => ro.repareOrders) // Flatten the collection of RepareOrders
+                 .ToListAsync();
+
+            var repairOrderDtos = _mapper.Map<List<RepareOrderDto>>(repairOrders);
+            return repairOrderDtos;
         }
         //Get ServiceProvider By Id Async
         public async Task<Service_ProviderDto> GetServiceProviderByIdAsync(string id)

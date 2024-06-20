@@ -18,10 +18,11 @@ namespace ServiceLayer
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<RepareOrder_ApplicationUser> RepairOrder_ApplicationUsers { get; set; }  
+        public DbSet<RepareOrder> RepareOrders { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Photo> photos { get; set; }
         public DbSet<Product_Shoppingcart> product_Shoppingcarts { get; set; }
-        public DbSet<RepareOrder> RepareOrders { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<WinchDriver> WinchDrivers { get; set; }
         public DbSet<WinchOrder> WinchOrders { get; set; }

@@ -42,7 +42,7 @@ namespace DomainLayer.Models
         public Photo photo { get; set; }
         public WinchDriver WinchDriver { get; set; }
         [JsonIgnore]
-        public ICollection<RepareOrder> RepairOrder { get; set; }
+        public ICollection<RepareOrder_ApplicationUser> RepairOrder { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
         public ICollection<Product> Products { get; set; }
         public ICollection<WinchOrder> WinchOrders { get; set; }
