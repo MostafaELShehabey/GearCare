@@ -44,7 +44,8 @@ namespace ServiceLayer.SellerServices
         {
             if (photo == null || photo.Length == 0)
             {
-                return new Response { Message = "The photo is not added", StatusCode = 400 , IsDone=false  };          }
+                return new Response { Message = "The photo is not added", StatusCode = 400 , IsDone=false  };
+            }
 
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
 
@@ -119,13 +120,13 @@ namespace ServiceLayer.SellerServices
 
             var seller = _context.Users.First(x=>x.Email==userEmail);
 
-            var sellerId = seller.Id;
+            var sellerId = seller.Id.ToString();
             if (productDto.Name==null || productDto.Price <= 0 || productDto.Description==null || sellerId==null)// Logical Error 
             {
                 return new Response { Message = "Invalid product or seller information." , StatusCode = 404, IsDone = false };
             }
 
-            var category = await _context.Categories.AnyAsync(x => x.Id == productDto.CategoryId);
+            var category = await _context.Categories.AnyAsync(x => x.Name.ToLower() == productDto.CategoryName.ToLower());
             if(!category)
             {
                 return new Response { IsDone = false , Message = "Category NOT Found !", StatusCode=404};
@@ -137,8 +138,6 @@ namespace ServiceLayer.SellerServices
                 urls.Add(photoPath);
             }
 
-           
-            
             var product = new Product
             { 
                 Name = productDto.Name,
@@ -146,7 +145,8 @@ namespace ServiceLayer.SellerServices
                 Description = productDto.Description,
                 PictureURL = urls,
                 SellerId = sellerId,
-                Categoryid = productDto.CategoryId,
+                CategoryName= productDto.CategoryName,
+                Quantity = productDto.Quantity,
                 Seller= seller,
                 instock = true,
                 deleted = false,
@@ -158,12 +158,12 @@ namespace ServiceLayer.SellerServices
                 return new Response { Message = "Seller not found", IsDone=false , StatusCode=404};
             }
 
-            if (!await _context.Categories.AnyAsync(c => c.Id == productDto.CategoryId))
+            if (!await _context.Categories.AnyAsync(c => c.Name.ToLower() == productDto.CategoryName.ToLower()))
             {
                 return new Response {Message= "Category not found" , StatusCode = 404 , IsDone=false};
             }
 
-            _context.Products.Add(product);
+            await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
             var result = _mapper.Map<ProductOutputDTO>(product);
@@ -272,7 +272,6 @@ namespace ServiceLayer.SellerServices
             _context.discounts.Add(discount);
             await _context.SaveChangesAsync();
             return new Response { IsDone = true , StatusCode=200, Model= discount};
-            
         }
 
 
@@ -294,6 +293,7 @@ namespace ServiceLayer.SellerServices
 
             // Associate the discount with the product
             product.Discount = discount;
+            product.newPrice = product.price-((product.price * discount.Persentage) / 100);
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
@@ -304,13 +304,10 @@ namespace ServiceLayer.SellerServices
                 Id = productId,
                 Name = product.Name,
                 price = product.price,
-                newPrice = (product.price*discount.Persentage)/100,
+                newPrice = product.newPrice,
                 Description = product.Description,
-                Categoryid = product.Categoryid,
-                Discount = new Discount
-                {
-                    Persentage = discount.Persentage
-                }
+                CategoryName = product.CategoryName.ToLower(),
+                Discount = discount
             };
 
             var result= _mapper.Map<ProductOutputDTO>(products);
@@ -345,28 +342,26 @@ namespace ServiceLayer.SellerServices
         // Get My Product
         public Response GetMyProducts(string userEmail)
         {
-            var sellerId = _context.Users.First(x => x.Email == userEmail).Id;
-            if (string.IsNullOrWhiteSpace(sellerId))
+            var user =  _context.Users.Where(x=>x.Email==userEmail).FirstOrDefault();
+            if (user == null)
             {
-               return  new Response {Message= "Invalid  seller information." , IsDone=false , StatusCode=400};
+                return new Response { Message = "Invalid seller information.", IsDone = false, StatusCode = 400 };
             }
 
-            var products = _context.Products
-             .Where(p => p.SellerId == sellerId && !p.deleted)
-            .Select(s => new Product
-            {
-                Id = s.Id,
-                Name = s.Name,
-                price = s.price,
-                Description=s.Description,
-                Discount = s.Discount,
-                Categoryid= s.Categoryid,
-                Seller = s.Seller
-            });
+            var sellerId = user.Id;
+            var products =   _context.Products
+                                         .Where(x => x.SellerId == sellerId && !x.deleted)
+                                         .ToList();
 
-            var result= _mapper.Map<List<ProductDto>>(products);
-           return new Response { Model = result ,StatusCode =200 , IsDone= true };
+            if (products == null || !products.Any())
+            {
+                return new Response { Message = "You don’t have any products, Add Some.", IsDone = false, StatusCode = 400 };
+            }
+
+           var result = _mapper.Map<List<ProductOutputDTO>>(products);
+            return new Response { Model = result, StatusCode = 200, IsDone = true };
         }
+
 
 
         //update personal data 

@@ -17,8 +17,6 @@ namespace DomainLayer.Dto
         public string cartype { get; set; }
         public string location { get; set; }
         public string ProblemDescription  { get; set; }
-        
-      
-
+  
     }
 }

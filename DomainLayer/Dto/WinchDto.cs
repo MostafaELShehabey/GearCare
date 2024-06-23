@@ -8,9 +8,8 @@ namespace DomainLayer.Dto
 {
     public class WinchDto
     {
-        public string Licence { get; set; }//image
-        public string photo { get; set; }//image
-        public string Model { get; set; }
+        public List<string> photo { get; set; }//image
         public bool Availabile { get; set; } 
+        public WinchDriverOUTDto Driver { get; set; }
     }
 }

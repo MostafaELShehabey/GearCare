@@ -47,7 +47,7 @@ namespace ServiceLayer.Mapping
             CreateMap<ApplicationUser, Service_ProviderDto>().ReverseMap();
 
 
-            CreateMap<ApplicationUser, WinchDriverDto>().ForMember(des=>des.winchModel,x=>x.MapFrom(srs=>srs.WinchDriver.Winch.Model));
+           // CreateMap<ApplicationUser, WinchDriverDto>().ForMember(des=>des.winchModel,x=>x.MapFrom(srs=>srs.WinchDriver.Winch.Model));
 
         }
     }

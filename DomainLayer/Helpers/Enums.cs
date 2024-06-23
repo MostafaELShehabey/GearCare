@@ -33,7 +33,7 @@ namespace DomainLayer.Helpers
             Cancelled,          //0     cancelled 
             PendingApproval,    //1     waiting the aproval 
             inProgress,         //2     approved put didnt copmpleted 
-            Comlpeted           //3     completed successfuly 
+            Completed           //3     completed successfuly 
         }
 
        

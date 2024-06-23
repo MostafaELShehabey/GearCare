@@ -15,7 +15,8 @@ namespace ServiceLayer.ApplicationUserServices
         Task<Response> CompletePersonalData(string userId, AddCarTypeToUser userDto);
 
         // Get a list of available service providers based on type, location, and car type.
-        Task<Response> GetServiceProviderAvailable(UserType userType, string location, string Cartype);
+        Task<Response> GetServiceProviderAvailable(UserType userType, string? location, string? Cartype, string userEmail);
+        Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype);
 
         //Get list of sellers.
         Task<Response> GetSellers(string? location);
@@ -24,7 +25,7 @@ namespace ServiceLayer.ApplicationUserServices
         Task<Response> CreateRepareOrder(string userId ,RepareOrderDto repareOrderDto);
 
         //Get all products(optionally filtered by search criteria)
-        Task<Response> GetAllProducts(string? search);
+        Response GetAllProducts(string? search);
 
         //Get all products in the shopping cart for a user.
         Task<Response> GetAllProductsInShoppingCart(string userId);
@@ -33,7 +34,7 @@ namespace ServiceLayer.ApplicationUserServices
         Task<Response> GetAllCategories();
 
         // Filter products by category ID.
-        Task<Response> FilterByCategory(string id);
+        Task<Response> FilterByCategory(string name);
 
         // Add a product to the shopping cart for a user
         Task<Response> AddProductToShoppingCart(string userId, string productId);

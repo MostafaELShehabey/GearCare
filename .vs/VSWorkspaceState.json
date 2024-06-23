@@ -2,8 +2,10 @@
   "ExpandedNodes": [
     "",
     "\\GearCareAPI",
-    "\\GearCareAPI\\Controllers"
+    "\\GearCareAPI\\Controllers",
+    "\\ServiceLayer",
+    "\\ServiceLayer\\SellerServices"
   ],
-  "SelectedNode": "\\GearCareAPI\\Controllers\\ServicePeoviderController.cs",
+  "SelectedNode": "\\GearCareAPI\\GearCareAPI.sln",
   "PreviewInSolutionExplorer": false
 }

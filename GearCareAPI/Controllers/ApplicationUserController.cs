@@ -2,6 +2,7 @@
 using DomainLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -49,11 +50,12 @@ namespace GearCareAPI.Controllers
 
 
         [HttpGet("GetServiceProviderAvailable")]
-        public async Task<IActionResult> GetServiceProviderAvailable(UserType userType, string location, string carType)
+        public async Task<IActionResult> GetServiceProviderAvailable(UserType userType, string? location, string ?carType )
         {
             try
             {
-                var providers = await _applicationUserService.GetServiceProviderAvailable(userType, location, carType);
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var providers = await _applicationUserService.GetServiceProviderAvailable(userType, location, carType, userEmail);
                 return Ok(providers);
             }
             catch (Exception ex)
@@ -96,8 +98,9 @@ namespace GearCareAPI.Controllers
         {
             try
             {
-                var products = await _applicationUserService.GetAllProducts(search);
+                var products = _applicationUserService.GetAllProducts(search);
                 return Ok(products);
+
             }
             catch (Exception ex)
             {
@@ -135,12 +138,12 @@ namespace GearCareAPI.Controllers
         }
 
 
-        [HttpGet("FilterProductByCategory/{categoryId}")]
-        public async Task<IActionResult> FilterByCategory(string categoryId)
+        [HttpGet("FilterProductByCategory/{CategoryName}")]
+        public async Task<IActionResult> FilterByCategory(string categoryName)
         {
             try
             {
-                var products = await _applicationUserService.FilterByCategory(categoryId);
+                var products = await _applicationUserService.FilterByCategory(categoryName);
                 return Ok(products);
             }
             catch (Exception ex)

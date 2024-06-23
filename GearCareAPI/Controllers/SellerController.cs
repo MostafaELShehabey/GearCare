@@ -175,12 +175,25 @@ namespace GearCareAPI.Controllers
         }
 
         // Get my products
-        [HttpGet("GetMyProducts")]
+        [HttpGet("GetAllMyProducts")]
         public async Task<IActionResult> GetMyProducts()
         {
-            var userId = _userManager.GetUserId(User);
-            var result = _sellerService.GetMyProducts(userId);
-            return Ok(result);
+            try
+            {
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (userEmail == null)
+                {
+                    return Unauthorized(new { Message = "User ID not found in token." });
+                }
+                    var result = _sellerService.GetMyProducts(userEmail);
+                    return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"internal server error {ex.InnerException}");
+            }
+
         }
 
         [HttpPut("UpdatePersonalData")]

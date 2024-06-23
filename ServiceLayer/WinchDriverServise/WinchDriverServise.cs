@@ -27,7 +27,7 @@ namespace ServiceLayer.WinchDriverServise
         private readonly IMapper _mapper;
         private readonly Cloudinary _cloudinary;
 
-        public WinchDriverServise(ApplicationDbContext context, IMapper mapper,UserManager<ApplicationUser> userManager , IOptions<CloudinarySettings> config)
+        public WinchDriverServise(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager, IOptions<CloudinarySettings> config)
         {
             _context = context;
             _mapper = mapper;
@@ -40,9 +40,11 @@ namespace ServiceLayer.WinchDriverServise
             );
             _cloudinary = new Cloudinary(acc);
         }
-        private async Task<string> WinchlicencePhotos(IFormFile file)
-        {
 
+
+
+        private async Task<string> UploadPhotoAsync(IFormFile file, string folder)
+        {
             if (file == null || file.Length == 0)
                 throw new ArgumentNullException("file", "No file uploaded");
 
@@ -51,48 +53,9 @@ namespace ServiceLayer.WinchDriverServise
                 var uploadParams = new ImageUploadParams()
                 {
                     File = new FileDescription(file.FileName, stream),
-                    Folder = "WinchlicencePhotos"
+                    Folder = folder
                 };
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
-                return uploadResult.Uri.ToString();
-            }
-        }
-
-        private async Task<string> WinchPhotos(IFormFile file)
-        {
-
-            if (file == null || file.Length == 0)
-                throw new ArgumentNullException("file", "No file uploaded");
-
-            using (var stream = file.OpenReadStream())
-            {
-                var uploadParams = new ImageUploadParams()
-                {
-                    File = new FileDescription(file.FileName, stream),
-                    Folder = "WinchPhotos"
-                };
-                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
-                return uploadResult.Uri.ToString();
-            }
-        }
-
-        private async Task<string> SavePersonalPhotoAsync(IFormFile file)
-        {
-
-            if (file == null || file.Length == 0)
-                throw new ArgumentNullException("file", "No file uploaded");
-
-            using (var stream = file.OpenReadStream())
-            {
-                var uploadParams = new ImageUploadParams()
-                {
-                    File = new FileDescription(file.FileName, stream),
-                    Folder = "PersonalPhotos"
-                };
-                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-
                 return uploadResult.Uri.ToString();
             }
         }
@@ -105,45 +68,49 @@ namespace ServiceLayer.WinchDriverServise
             {
                 return new Response { IsDone = false, Message = "User not found.", StatusCode = 404 };
             }
-            driver.Spezilization = winchdata.Spezilization;
-            var winch =  await _context.Winchs.FirstOrDefaultAsync(x => x.WinchDriver.Id == driver.Id);
 
-            var winchphotoURL = new List<string>();
-            foreach(var photo in winchPhoto)
-            {
-                var photopath = await WinchPhotos(photo);
-                winchphotoURL.Add(photopath);
-            }
-
-
-
-            if (WinchlicencePhoto.Count() != 2)
+            if (WinchlicencePhoto.Count != 2)
             {
                 return new Response { IsDone = false, Message = "Please add exactly 2 pictures: front and back of the winch license.", StatusCode = 400 };
             }
 
-            var licenceURL = new List<string>();    
-            for (int i = 0; i <=2;i++)
+            driver.Spezilization = winchdata.Spezilization;
+
+            var winch = await _context.Winchs.FirstOrDefaultAsync(x => x.DriverId == driver.Id);
+            if (winch == null)
             {
-                var photopath = await WinchlicencePhotos(WinchlicencePhoto[i]);
-                licenceURL.Add(photopath);
+                winch = new Winch { DriverId = driver.Id };
+                await _context.Winchs.AddAsync(winch);
             }
 
-            var data = new Winch
+            var winchPhotoUrls = new List<string>();
+            foreach (var photo in winchPhoto)
             {
-                Model = winchdata.Model,
-                DriverId = driver.Id,
-                Availabile = true,
-                Licence = licenceURL,
-                photo = winchphotoURL
-            };
+                var photoPath = await UploadPhotoAsync(photo, "WinchPhotos");
+                winchPhotoUrls.Add(photoPath);
+            }
 
-            await _context.Winchs.AddAsync(data);
+            var licenceUrls = new List<string>();
+            foreach (var photo in WinchlicencePhoto)
+            {
+                var photoPath = await UploadPhotoAsync(photo, "WinchLicencePhotos");
+                licenceUrls.Add(photoPath);
+            }
+
+            winch.Model = winchdata.Model;
+            winch.Availabile = true;
+            winch.Licence = licenceUrls;
+            winch.photo = winchPhotoUrls;
+
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<WinchOutputDTO>(data);
+
+            var result = _mapper.Map<WinchOutputDTO>(winch);
             result.Spezilization = driver.Spezilization;
-            return new Response { IsDone = true,Model = result, StatusCode =200};
+
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
+
+
 
 
         private async Task<string> WinchDriverIDPhotos(IFormFile file)
@@ -167,41 +134,26 @@ namespace ServiceLayer.WinchDriverServise
 
 
 
-        public async Task<Response> AddIDphoto(IFormFileCollection photo, string userEmail)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
-            var IDURL = new List<string>();
-            for (int i = 0; i < 2; i++)
-            {
-                var photopath = await WinchlicencePhotos(photo[i]);
-                IDURL.Add(photopath);
-            }
-
-            await _context.SaveChangesAsync();
-
-            var result = _mapper.Map<CompleteSelerData>(user);
-            return new Response { IsDone = true, Model = result, StatusCode = 200 };
-        }
 
 
-       
-
-      
 
         public async Task<Response> HandleOrderAction(string userEmail, string orderId, OrderAction action)
         {
+            // Find the user by email
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
             {
                 return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
+            // Find the order by DriverId and orderId
             var order = await _context.WinchOrders.FirstOrDefaultAsync(sp => sp.DriverId == user.Id && sp.Id == orderId);
             if (order == null)
             {
                 return new Response { Message = "This user ID or order ID does not exist.", StatusCode = 404, IsDone = false };
             }
 
+            // Handle the action
             switch (action)
             {
                 case OrderAction.Accept:
@@ -214,17 +166,31 @@ namespace ServiceLayer.WinchDriverServise
                     break;
                 case OrderAction.Cancel:
                     order.Status = Status.Cancelled;
-                    user.available = true ;
+                    user.available = true;
                     break;
                 case OrderAction.Completed:
-                    order.Status = Status.Comlpeted;
+                    order.Status = Status.Completed;
                     user.available = true;
                     break;
                 default:
-                    return new Response { Message = $"Invalid : {action}", StatusCode = 400, IsDone = false };       }
+                    return new Response { Message = $"Invalid action: {action}", StatusCode = 400, IsDone = false };
+            }
+
+            // Create result DTO
+            var result = new WinchDriverDto
+            {
+                Name = order.Driver.Name,
+                Location = order.Driver.Location,
+                Number = order.Driver.PhoneNumber,
+                Spezilization = order.Driver.Spezilization,
+                winchModel = user.WinchDriver.Winch.Model
+            };
+           
+            // Save changes to the database
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<WinchDriverDto>(order);
-            return new Response { Model = result, StatusCode = 200 };
+
+            // Return response
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
 
 
@@ -236,7 +202,7 @@ namespace ServiceLayer.WinchDriverServise
             var userid = user.Id;
             if (user == null)
             {
-                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
+                return new Response { Message = $"Invalid or non-existent user ID: {user.Id}", StatusCode = 404, IsDone = false };
             }
 
             var myOrder = new List<WinchOrder>();
@@ -266,7 +232,7 @@ namespace ServiceLayer.WinchDriverServise
             if (orderBy == Enums.OrderBy.status)
             {
                 var myorder = _context.WinchOrders.Where(x => x.DriverId == userid).
-                    OrderBy(x => x.Status == Status.Comlpeted)
+                    OrderBy(x => x.Status == Status.Completed)
                                       .ThenBy(x => x.Status == Status.inProgress)
                                       .ThenBy(x => x.Status == Status.PendingApproval)
                                       .ThenBy(x => x.Status == Status.Cancelled).ToList();
@@ -275,8 +241,8 @@ namespace ServiceLayer.WinchDriverServise
             }
             else
             {
-                var myorder = _context.RepareOrders.OrderBy(x => x.Date);
-                var result = _mapper.Map<List<WinchDriverDto>>(myorder);
+                var myorder = _context.WinchOrders.OrderBy(x => x.Date);
+                var result = _mapper.Map<List<WinchOrderDTO>>(myorder);
                 return new Response { Model = result, StatusCode = 200 };
             }
 
@@ -293,16 +259,14 @@ namespace ServiceLayer.WinchDriverServise
 
             user.Name = driverDto.Name;
             user.CarType = driverDto.winchModel;
-            user.PhotoId = await SavePersonalPhotoAsync(photo);
-            user.Location =driverDto.Location;
-            user.Spezilization =driverDto.Spezilization;
+            user.PhotoId = await UploadPhotoAsync(photo,"winchDriverPhotos");                      
+            user.Spezilization = driverDto.Spezilization;
             winch.Model = driverDto.winchModel;
             await _context.SaveChangesAsync();
             var result = _mapper.Map<WinchDriverDto>(user);
             return new Response { Model = result, StatusCode = 200, Message = "your data is updated successfully " };
         }
 
-      
 
     }
 }

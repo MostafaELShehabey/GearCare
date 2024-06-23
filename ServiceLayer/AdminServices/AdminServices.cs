@@ -95,31 +95,33 @@ namespace ServiceLayer.AdminServices
         // Get All Repair Orders Async
         public async Task<List<RepareOrderDto>> GetAllRepairOrdersAsync(Status statusType, string search, int page, int pageSize)
         {
-            var query = _context.RepairOrder_ApplicationUsers
-                    .Include(x => x.applicationUsers)
-                    .ThenInclude(ro => ro.RepairOrder)
-                      .Where(ro => ro.repareOrders.Any(o => o.Status == statusType));
-            
-            var  stateus = statusType.ToString();
-            if (!string.IsNullOrEmpty(stateus))
-            {
-                if (!string.IsNullOrEmpty(search))
-                {
-                    query = query.Where(ro =>
-                        ro.applicationUsers.Any(o =>
-                            o.Name.Contains(search) ||
-                            o.PhoneNumber.Contains(search) ||
-                            o.CarType.Contains(search) ||
-                            o.Email.Contains(search) ||
-                            o.Location.Contains(search)
-                        ));
-                }
-            }
-            var repairOrders = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .SelectMany(ro => ro.repareOrders) // Flatten the collection of RepareOrders
-                 .ToListAsync();
+            var query = _context.RepareOrders.ToList();
+            //var query = _context.RepairOrder_ApplicationUsers
+            //        .Include(x => x.applicationUsers)
+            //        .ThenInclude(ro => ro.RepairOrder)
+            //          .Where(ro => ro.repareOrders.Any(o => o.Status == statusType));
+
+            //var  stateus = statusType.ToString();
+            //if (!string.IsNullOrEmpty(stateus))
+            //{
+            //    if (!string.IsNullOrEmpty(search))
+            //    {
+            //        query = query.Where(ro =>
+            //            ro.applicationUsers.Any(o =>
+            //                o.Name.Contains(search) ||
+            //                o.PhoneNumber.Contains(search) ||
+            //                o.CarType.Contains(search) ||
+            //                o.Email.Contains(search) ||
+            //                o.Location.Contains(search)
+            //            ));
+            //    }
+            //}
+            var repairOrders = query;
+            //var repairOrders = await query
+            //    .Skip((page - 1) * pageSize)
+            //    .Take(pageSize)
+            //    .SelectMany(ro => ro.repareOrders) // Flatten the collection of RepareOrders
+            //     .ToListAsync();
 
             var repairOrderDtos = _mapper.Map<List<RepareOrderDto>>(repairOrders);
             return repairOrderDtos;

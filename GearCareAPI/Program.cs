@@ -19,6 +19,8 @@ using ServiceLayer.WinchDriverService;
 using ServiceLayer.WinchDriverServise;
 using System.Net;
 using System.Text;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = new ConfigurationBuilder()
@@ -47,7 +49,6 @@ builder.Services.AddScoped<IMapper, Mapper>();
 builder.Services.AddCustomJwtAuth(builder.Configuration);
 builder.Services.AddSwaggerGenJwtAuth();
 builder.Services.AddControllers();
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddLogging();
