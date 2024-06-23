@@ -12,14 +12,12 @@ namespace DomainLayer.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
-        [MaxLength(50)]
-        public string Name { get; set; }
-        [MaxLength(11)]
-        public int PhoneNumber { get; set; }
-        public string DriverLicence { get; set; }//photo 
-        
+      
+        public string DriveringLicence { get; set; }
+      
         [ForeignKey("Winch")]
         public string winchId { get; set; }
+
         public Winch Winch { get; set; }
 
         [ForeignKey("DriverId")]

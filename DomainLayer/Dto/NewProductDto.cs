@@ -18,7 +18,7 @@ namespace DomainLayer.Dto
         public string Description { get; set; }
         public bool InStock { get; set; }
         public string SellerId { get; set; }
-        public string CategoryId { get; set; }
+        public string CategoryName { get; set; }
         public SellerDto Seller { get; set; }
         public Category Category { get; set; }
         public Discount Discount { get; set; }

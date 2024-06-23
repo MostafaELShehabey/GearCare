@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServiceLayer.Migrations
 {
     /// <inheritdoc />
-    public partial class applicationuserupdate : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,7 +43,7 @@ namespace ServiceLayer.Migrations
                 columns: table => new
                 {
                     id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Persentage = table.Column<double>(type: "float", nullable: true)
+                    Persentage = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -51,11 +51,25 @@ namespace ServiceLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RepareOrder_ApplicationUser",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    userId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    orderId = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RepareOrder_ApplicationUser", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Winchs",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Licence = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Licence = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    photo = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Model = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Availabile = table.Column<bool>(type: "bit", nullable: false),
                     DriverId = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -87,22 +101,43 @@ namespace ServiceLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WinchDrivers",
+                name: "RepareOrders",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PhoneNumber = table.Column<int>(type: "int", maxLength: 11, nullable: false),
-                    DriverLicence = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    winchId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    OrderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    cartype = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ProblemDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ClientId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ServiceProviderId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WinchDrivers", x => x.Id);
+                    table.PrimaryKey("PK_RepareOrders", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_WinchDrivers_Winchs_winchId",
-                        column: x => x.winchId,
-                        principalTable: "Winchs",
+                        name: "FK_RepareOrders_RepareOrder_ApplicationUser_UserId",
+                        column: x => x.UserId,
+                        principalTable: "RepareOrder_ApplicationUser",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApplicationUserRepareOrder_ApplicationUser",
+                columns: table => new
+                {
+                    RepairOrderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    applicationUsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationUserRepareOrder_ApplicationUser", x => new { x.RepairOrderId, x.applicationUsersId });
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserRepareOrder_ApplicationUser_RepareOrder_ApplicationUser_RepairOrderId",
+                        column: x => x.RepairOrderId,
+                        principalTable: "RepareOrder_ApplicationUser",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -169,7 +204,6 @@ namespace ServiceLayer.Migrations
                     CarType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Rate = table.Column<int>(type: "int", nullable: false),
                     NumberOfRates = table.Column<int>(type: "int", nullable: false),
-                    IdPhoto = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     available = table.Column<bool>(type: "bit", nullable: false),
                     Spezilization = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CarTypeToRepaire = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -222,12 +256,15 @@ namespace ServiceLayer.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PictureURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     price = table.Column<double>(type: "float", nullable: false),
+                    newPrice = table.Column<double>(type: "float", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     instock = table.Column<bool>(type: "bit", nullable: false),
                     deleted = table.Column<bool>(type: "bit", nullable: false),
                     SellerId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Categoryid = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Discountid = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Discountid = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CategorysId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -239,8 +276,8 @@ namespace ServiceLayer.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Products_Categories_Categoryid",
-                        column: x => x.Categoryid,
+                        name: "FK_Products_Categories_CategorysId",
+                        column: x => x.CategorysId,
                         principalTable: "Categories",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -248,28 +285,6 @@ namespace ServiceLayer.Migrations
                         column: x => x.Discountid,
                         principalTable: "discounts",
                         principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RepareOrders",
-                columns: table => new
-                {
-                    OrderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Price = table.Column<double>(type: "float", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ProblemDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RepareOrders", x => x.OrderId);
-                    table.ForeignKey(
-                        name: "FK_RepareOrders_AspNetUsers_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -293,30 +308,29 @@ namespace ServiceLayer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WinchOrders",
+                name: "WinchDrivers",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Price = table.Column<int>(type: "int", nullable: false),
-                    Rate = table.Column<int>(type: "int", nullable: false),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    DriverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    wichClient = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    PhoneNumber = table.Column<int>(type: "int", maxLength: 11, nullable: false),
+                    DriverLicence = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    winchId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    DriverId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WinchOrders", x => x.Id);
+                    table.PrimaryKey("PK_WinchDrivers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WinchOrders_AspNetUsers_wichClient",
-                        column: x => x.wichClient,
+                        name: "FK_WinchDrivers_AspNetUsers_DriverId",
+                        column: x => x.DriverId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_WinchOrders_WinchDrivers_DriverId",
-                        column: x => x.DriverId,
-                        principalTable: "WinchDrivers",
+                        name: "FK_WinchDrivers_Winchs_winchId",
+                        column: x => x.winchId,
+                        principalTable: "Winchs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -364,6 +378,40 @@ namespace ServiceLayer.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "WinchOrders",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Price = table.Column<int>(type: "int", nullable: false),
+                    Rate = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    DriverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    wichClient = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WinchOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WinchOrders_AspNetUsers_wichClient",
+                        column: x => x.wichClient,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_WinchOrders_WinchDrivers_DriverId",
+                        column: x => x.DriverId,
+                        principalTable: "WinchDrivers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserRepareOrder_ApplicationUser_applicationUsersId",
+                table: "ApplicationUserRepareOrder_ApplicationUser",
+                column: "applicationUsersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -425,9 +473,9 @@ namespace ServiceLayer.Migrations
                 column: "ShoppingcartId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Products_Categoryid",
+                name: "IX_Products_CategorysId",
                 table: "Products",
-                column: "Categoryid");
+                column: "CategorysId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_Discountid",
@@ -440,14 +488,20 @@ namespace ServiceLayer.Migrations
                 column: "SellerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RepareOrders_ClientId",
+                name: "IX_RepareOrders_UserId",
                 table: "RepareOrders",
-                column: "ClientId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ShoppingCarts_ClientId",
                 table: "ShoppingCarts",
                 column: "ClientId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WinchDrivers_DriverId",
+                table: "WinchDrivers",
+                column: "DriverId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -465,6 +519,14 @@ namespace ServiceLayer.Migrations
                 name: "IX_WinchOrders_wichClient",
                 table: "WinchOrders",
                 column: "wichClient");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ApplicationUserRepareOrder_ApplicationUser_AspNetUsers_applicationUsersId",
+                table: "ApplicationUserRepareOrder_ApplicationUser",
+                column: "applicationUsersId",
+                principalTable: "AspNetUsers",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_AspNetUserClaims_AspNetUsers_UserId",
@@ -506,6 +568,9 @@ namespace ServiceLayer.Migrations
                 table: "Products");
 
             migrationBuilder.DropTable(
+                name: "ApplicationUserRepareOrder_ApplicationUser");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -534,6 +599,9 @@ namespace ServiceLayer.Migrations
 
             migrationBuilder.DropTable(
                 name: "ShoppingCarts");
+
+            migrationBuilder.DropTable(
+                name: "RepareOrder_ApplicationUser");
 
             migrationBuilder.DropTable(
                 name: "WinchDrivers");

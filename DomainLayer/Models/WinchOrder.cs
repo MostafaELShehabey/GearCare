@@ -15,22 +15,20 @@ namespace DomainLayer.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
-        public int Price { get; set; }
+       // public int Price { get; set; }
         [Range(0,5)]
         public int Rate { get; set; }
         public DateTime Date { get; set; }
         public Status Status { get; set; }
-        [ForeignKey("WinchDriver")]
+      // [ForeignKey("WinchDriver")]
         public string DriverId { get; set; }
-        [ForeignKey("WinchClient")]
-        public string wichClient  { get; set; }
+        //[ForeignKey("WinchClient")]
+        public string ClientId  { get; set; }
 
-        //[JsonIgnore]
-        //[IgnoreDataMember]
-        public ApplicationUser WinchClient { get; set; }
+       public ApplicationUser Client { get; set; }
+       public ApplicationUser Driver { get; set; }
 
-        //[JsonIgnore]
-        //[IgnoreDataMember]
-        public WinchDriver WinchDriver { get; set; }
+        //public WinchOrder_ApplicationUser user { get; set; }
+        //public WinchOrder_ApplicationUser user { get; set; }
     }
 }

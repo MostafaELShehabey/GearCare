@@ -13,9 +13,10 @@ namespace DomainLayer.Dto
         public string Name { get; set; }
         //public string PictureURL { get; set; }
         [RegularExpression(@"\d+(\.\d{1,2})?")] // make number like 15.00 
-        public double ? Price { get; set; }
+        public double Price { get; set; }
+        public int Quantity { get; set; }
         public string? Description { get; set; }
-        public string CategoryId { get; set; }
+        public string ?CategoryName { get; set; }
      
     }
 }

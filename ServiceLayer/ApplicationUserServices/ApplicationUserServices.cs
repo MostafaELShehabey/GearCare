@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using CloudinaryDotNet;
 using DomainLayer.Dto;
 using DomainLayer.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -39,75 +40,95 @@ namespace ServiceLayer.ApplicationUserServices
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                return new Response {IsDone=false, Message = "User not found." , StatusCode = 404};
+                return new Response { IsDone = false, Message = "User not found.", StatusCode = 404 };
             }
-            
+
             user.CarType = cartype.CarType;
             user.available = false;
             var finduser = await _userManager.UpdateAsync(user);
             if (!finduser.Succeeded)
             {
-                return new Response { IsDone = false, Message = "Failed to update user data." , StatusCode=400 };
+                return new Response { IsDone = false, Message = "Failed to update user data.", StatusCode = 400 };
             }
             await _context.SaveChangesAsync();
-            var result= _mapper.Map<CompleteUserDataDTO>(user);
-            return new Response { IsDone=true,Model = result , StatusCode=200};
+            var result = _mapper.Map<CompleteUserDataDTO>(user);
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
 
 
 
         // get lis of availabe service provider 
-        public async Task<Response> GetServiceProviderAvailable(UserType userType, string location, string Cartype)
+        public async Task<Response> GetServiceProviderAvailable(UserType userType, string? location, string? Cartype, string userEmail)
         {
-            if (userType.ToString() == "WinchDriver") {
-
-                if (location == null || Cartype == null)
-                {
-                    var serviceProviderQuery = await _context.Users
-                    .Where(sp => sp.UserType==userType && sp.available)
-                    .ToListAsync();
-                    var serviceProviderDtos = _mapper.Map<List<Service_ProviderDto>>(serviceProviderQuery);
-                    return new Response { IsDone = true, Model = serviceProviderDtos };
-                }
-                else
-                {
-                    var serviceProviderQuery = _context.Users
-                            .Where(sp => sp.UserType == userType && (
-                             EF.Functions.Like(sp.Location, $"%{location}%") ||
-                               sp.CarTypeToRepaire.Any(ct => EF.Functions.Like(ct, $"%{Cartype}%"))) &&
-                                         sp.available)
-                            .OrderBy(o => o.Location)
-                            .ThenBy(o => o.Rate)
-                            .ToList();
-
-                    return new Response { IsDone = true, Model = serviceProviderQuery };
-                }
-
-            }else
+            // If the userType is WinchDriver
+            if (userType == UserType.WinchDriver)
             {
-                if (location == null || Cartype == null)
+                var query = _context.Users
+                    .Where(sp => sp.UserType == userType && sp.available);
+
+                if (!string.IsNullOrEmpty(location))
                 {
-                    var serviceProviderQuery = await _context.Users
-                    .Where(sp => sp.UserType == userType && sp.available)
+                    query = query.Where(sp => sp.Location.ToLower().Contains(location.ToLower()));
+                }
+
+                if (!string.IsNullOrEmpty(Cartype))
+                {
+                    query = query.Where(sp => sp.WinchDriver.Winch.Model.ToLower().Contains(Cartype.ToLower()));
+                }
+
+                var winchDrivers = await query
+                    .Select(driver => new WinchDriverOUTDto
+                    {
+                        Id = driver.Id,
+                        Name = driver.Name,
+                        Number = driver.PhoneNumber,
+                        Location = driver.Location,
+                        Spezilization = driver.Spezilization,
+                        winchModel = driver.WinchDriver.Winch.Model
+                    })
                     .ToListAsync();
-                    var serviceProviderDtos = _mapper.Map<List<Service_ProviderDto>>(serviceProviderQuery);
-                    return new Response { IsDone = true, Model = serviceProviderDtos };
-                }
-                else
-                {
-                    var serviceProviderQuery = _context.Users
-                               .Where(sp => sp.UserType == userType && (
-                                EF.Functions.Like(sp.Location, $"%{location}%") ||
-                               sp.CarTypeToRepaire.Any(ct=> EF.Functions.Like(ct, $"%{Cartype}%"))) &&
-                                            sp.available)
-                               .OrderBy(o => o.Location)
-                               .ThenBy(o => o.Rate)
-                               .ToList();
-                    var serviceProviderDtos = _mapper.Map<List<Service_ProviderDto>>(serviceProviderQuery);
-                    return new Response { IsDone = true, Model = serviceProviderDtos, StatusCode = 200 };
-                }
+
+                return new Response { IsDone = true, Model = winchDrivers };
             }
+
+            // If the userType is Mechanic or Electrician
+            if (userType == UserType.Mechanic || userType == UserType.Electrician)
+            {
+                var query = _context.Users
+                    .Where(sp => sp.UserType == userType && sp.available);
+
+                if (!string.IsNullOrEmpty(location))
+                {
+                    query = query.Where(sp => sp.Location.ToLower().Contains(location.ToLower()));
+                }
+
+                if (!string.IsNullOrEmpty(Cartype))
+                {
+                    query = query.Where(sp => sp.CarType.ToLower().Contains(Cartype.ToLower()));
+                }
+
+                var serviceProviders = await query.ToListAsync();
+                var serviceProviderDtos = _mapper.Map<List<Service_ProviderDto>>(serviceProviders);
+
+                return new Response { IsDone = true, Model = serviceProviderDtos, StatusCode = 200 };
+            }
+
+            // If the userType is not recognized
+            return new Response { IsDone = false, Message = "Invalid user type.", StatusCode = 200 };
+
+
         }
+
+
+        //Get winch driver avalable
+        public Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
 
         // get list of sellers  
         public async Task<Response> GetSellers(string? location)
@@ -136,11 +157,11 @@ namespace ServiceLayer.ApplicationUserServices
         public async Task<Response> CreateRepareOrder(string userEmail, RepareOrderDto repareOrderDto)
         {
             // select a technician to send him a request 
-            var user= await _userManager.FindByEmailAsync(userEmail);
+            var user = await _userManager.FindByEmailAsync(userEmail);
             var serviceProvider = await _context.Users.Where(x => x.Id == repareOrderDto.ServiceProvierId).FirstAsync();
-            if (user is  null)
+            if (user is null)
             {
-                return new Response { Message = $"User with ID {repareOrderDto.ServiceProvierId} was not found." , StatusCode=404, IsDone= false };
+                return new Response { Message = $"User with ID {repareOrderDto.ServiceProvierId} was not found.", StatusCode = 404, IsDone = false };
             }
             var repareOrder = new RepareOrder
             {
@@ -158,100 +179,120 @@ namespace ServiceLayer.ApplicationUserServices
             await _context.RepareOrders.AddAsync(repareOrder);
             await _context.SaveChangesAsync();
             var result = _mapper.Map<RepaireOrderOutDto>(repareOrder);
-            return new Response { IsDone=true,Model = result,StatusCode=200};
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
+        }
+
+
+
+        // create winch order 
+        public async Task<Response> CreateWinchOrder(string userEmail, RepareOrderDto repareOrderDto)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user is null)
+            {
+                return new Response { Message = $"Client with email {userEmail} was not found.", StatusCode = 404, IsDone = false };
+            }
+
+            // Find the driver by the provided ServiceProviderId
+            var driver = await _context.Users.FirstOrDefaultAsync(x => x.Id == repareOrderDto.ServiceProvierId);
+            if (driver is null)
+            {
+                return new Response { Message = $"Driver with ID {repareOrderDto.ServiceProvierId} was not found.", StatusCode = 404, IsDone = false };
+            }
+
+            // Create a new winch order
+            var order = new WinchOrder
+            {
+                ClientId = user.Id,
+                Date = DateTime.Now,
+                DriverId = driver.Id,
+                Status = Status.PendingApproval
+            };
+
+            // Add the order to the context
+            await _context.WinchOrders.AddAsync(order);
+            await _context.SaveChangesAsync();
+
+            // Map the order to the output DTO
+            var result = _mapper.Map<RepaireOrderOutDto>(order);
+
+            // Return the response
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
+
         }
 
 
         //get all product (randoum )
-        public async Task<Response> GetAllProducts(string? search) // search by names ( Name , Category Name )
+
+        public Response GetAllProducts(string? search)
         {
-            
-            var query =  _context.Products.Include(x=>x.Seller).AsQueryable();
-            // filter products based on name, price, or category
+            // Get the queryable products from the database
+            var query = _context.Products.ToList();
+
+            // Apply search filter if provided
             if (!string.IsNullOrEmpty(search))
             {
                 search = search.ToLower();
                 query = query.Where(p =>
-                    p.Name.ToLower().Contains(search) ||
-                    p.price.ToString().Contains(search) || // Assuming price is a string, adjust accordingly if it's a number
-                    p.Description.ToLower().Contains(search) ||
-                    p.Categorys.Name.ToLower().Contains(search));   
-
-                var products = await query.ToListAsync();
-
-                if (!products.Any())
-                {
-                    return new Response { IsDone = false, Message = "the product not Exit , try to search with differnt Name or Category ! ", StatusCode = 404 };
-                }
-
-
-                 var productDto = products.Select(p => new NewProductDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    PictureURL = p.PictureURL,
-                    Price = p.price,
-                    NewPrice = p.newPrice,
-                    Description = p.Description,
-                    InStock = p.instock,
-                    SellerId = p.SellerId,
-                    CategoryId = p.Categoryid,
-                    Seller = new SellerDto
-                    {
-                        Id = p.Seller.Id,
-                        Name = p.Seller.Name,
-                        Location = p.Seller.Location,
-                        PhotoId = p.Seller.PhotoId,
-                        Available = p.Seller.available,
-                        NumberOfRates = p.Seller.NumberOfRates,
-                        Rate = p.Seller.Rate,
-                        Specialization = p.Seller.Spezilization,
-                        UserType = p.Seller.UserType
-                    },
-                    Category = p.Categorys,
-                    Discount = p.Discount
-                }).ToList();
-
-                return new Response { IsDone = true, Model = products, StatusCode = 200 };
+                    (p.Name != null && p.Name.ToLower().Contains(search)) ||
+                     p.price.ToString().Contains(search) ||
+                    (p.Description != null && p.Description.ToLower().Contains(search)) ||
+                    (p.Categorys != null && p.Categorys.Name != null && p.Categorys.Name.ToLower().Contains(search))
+                    ).ToList();
             }
-            else
+
+            // Fetch and project the products
+            var products = query.Select(p => new NewProductDto
             {
-                // Shuffle the products randomly
-                // Fetch the data into memory and then order it randomly
-                var products = await query.ToListAsync();
-                var shuffledProducts = products.OrderBy(p => Guid.NewGuid()).ToList();
-
-                var productDto = shuffledProducts.Select(p => new NewProductDto
+                Id = p.Id,
+                Name = p.Name,
+                PictureURL = p.PictureURL,
+                Price = p.price,
+                NewPrice = p.newPrice,
+                Description = p.Description,
+                InStock = p.instock,
+                SellerId = p.SellerId,
+                CategoryName = p.CategoryName != null ? p.CategoryName.ToLower() : null,
+                Seller = p.Seller != null ? new SellerDto
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    PictureURL = p.PictureURL,
-                    Price = p.price,
-                    NewPrice = p.newPrice,
-                    Description = p.Description,
-                    InStock = p.instock,
-                    SellerId = p.SellerId,
-                    CategoryId = p.Categoryid,
-                    Seller = new SellerDto
-                    {
-                        Id = p.Seller.Id,
-                        Name = p.Seller.Name,
-                        Location = p.Seller.Location,
-                        PhotoId = p.Seller.PhotoId,
-                        Available = p.Seller.available,
-                        NumberOfRates = p.Seller.NumberOfRates,
-                        Rate = p.Seller.Rate,
-                        Specialization = p.Seller.Spezilization,
-                        UserType = p.Seller.UserType
-                    },
-                    Category = p.Categorys,
-                    Discount = p.Discount
-                }).ToList();
+                    Id = p.Seller.Id,
+                    Name = p.Seller.Name,
+                    Location = p.Seller.Location,
+                    PhotoId = p.Seller.PhotoId,
+                    Available = p.Seller.available,
+                    NumberOfRates = p.Seller.NumberOfRates,
+                    Rate = p.Seller.Rate,
+                    Specialization = p.Seller.Spezilization,
+                    UserType = p.Seller.UserType
+                } : null,
+                Category = p.Categorys,
+                Discount = p.Discount
+            }).ToList();
 
-                return new Response { IsDone = true, Model = productDto, StatusCode = 200 };
+            // Check if products were found
+            if (products.Count() == 0 && !string.IsNullOrEmpty(search))
+            {
+                return new Response
+                {
+                    IsDone = false,
+                    Message = "The product does not exist, try to search with a different Name or Category!",
+                    StatusCode = 404
+                };
             }
-        }
 
+            // Shuffle the products if no search term was provided
+            if (string.IsNullOrEmpty(search))
+            {
+                products = products.OrderBy(p => Guid.NewGuid()).ToList();
+            }
+
+            return new Response
+            {
+                IsDone = true,
+                Model = products,
+                StatusCode = 200
+            };
+        }
 
 
 
@@ -262,15 +303,15 @@ namespace ServiceLayer.ApplicationUserServices
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                return new Response {Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
+                return new Response { Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
             }
             var productsInCart = await _context.product_Shoppingcarts
             .Where(ps => ps.ShoppingCart.ClientId == user.Id)
             .Select(ps => ps.Product)
             .ToListAsync();
-             var result = _mapper.Map<List<ProductDto>>(productsInCart);
-            return new Response { IsDone=true , Model = result,StatusCode=200 };
-           // return productsInCart;
+            var result = _mapper.Map<List<ProductOutputDTO>>(productsInCart);
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
+            // return productsInCart;
         }
 
 
@@ -279,16 +320,16 @@ namespace ServiceLayer.ApplicationUserServices
         {
             var categories = await _context.Categories.ToListAsync();
             var result = _mapper.Map<List<CategoryDto>>(categories);
-            return new Response { IsDone=true,Model = result,StatusCode = 200 };
+            return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
 
-      
+
 
 
         // filter by category id 
-        public async Task<Response> FilterByCategory (string id)
+        public async Task<Response> FilterByCategory(string name)
         {
-            var products =await _context.Products.Where(o => o.Categorys.Id == id).ToListAsync();
+            var products = await _context.Products.Where(o => o.Categorys.Name == name).ToListAsync();
             var result = _mapper.Map<List<ProductDto>>(products);
             return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
@@ -296,19 +337,19 @@ namespace ServiceLayer.ApplicationUserServices
 
 
         //add product to my shopping cart 
-        public async  Task<Response> AddProductToShoppingCart(string userEmail, string productId)
+        public async Task<Response> AddProductToShoppingCart(string userEmail, string productId)
         {
             //Validate user ID
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                return new Response {Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
+                return new Response { Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
             }
             // Validate product ID
             var product = await _context.Products.FindAsync(productId);
             if (product == null)
             {
-                return new Response {Message = "The provided product ID is incorrect or the product does not exist.", StatusCode = 404, IsDone = false };
+                return new Response { Message = "The provided product ID is incorrect or the product does not exist.", StatusCode = 404, IsDone = false };
             }
             // Get the user's shopping cart, or create a new one if it doesn't exist
             var shoppingCart = await _context.ShoppingCarts
@@ -331,7 +372,7 @@ namespace ServiceLayer.ApplicationUserServices
             };
             _context.product_Shoppingcarts.Add(productShoppingCart);
             await _context.SaveChangesAsync();
-            return new Response { IsDone = true,Message = "Product added Successfully", StatusCode = 200 };
+            return new Response { IsDone = true, Message = "Product added Successfully", StatusCode = 200 };
         }
 
 
@@ -344,13 +385,13 @@ namespace ServiceLayer.ApplicationUserServices
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                return new Response {Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
+                return new Response { Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
             }
             // Validate product ID
             var product = await _context.Products.FindAsync(productId);
             if (product == null)
             {
-                return new Response {Message = "The provided product ID is incorrect or the product does not exist.", StatusCode = 404, IsDone = false };
+                return new Response { Message = "The provided product ID is incorrect or the product does not exist.", StatusCode = 404, IsDone = false };
             }
             // Get the user's shopping cart
             var shoppingCart = await _context.ShoppingCarts
@@ -359,19 +400,19 @@ namespace ServiceLayer.ApplicationUserServices
                 .FirstOrDefaultAsync(sc => sc.Client.Id == user.Id);
             if (shoppingCart == null)
             {
-                return new Response { Message = "Shopping cart not found." , StatusCode=404 , IsDone=false };
+                return new Response { Message = "Shopping cart not found.", StatusCode = 404, IsDone = false };
             }
             // Find the product in the shopping cart
             var productShoppingCart = shoppingCart.product_Shoppingcart
                 .FirstOrDefault(psc => psc.Product.Id == productId);
             if (productShoppingCart == null)
             {
-                return new Response { Message = "This product not Exist in your shopping cart." , StatusCode=404, IsDone = false };
+                return new Response { Message = "This product not Exist in your shopping cart.", StatusCode = 404, IsDone = false };
             }
             // Remove the product from the shopping cart
             shoppingCart.product_Shoppingcart.Remove(productShoppingCart);
             await _context.SaveChangesAsync();
-            return new Response { IsDone = true,Message = "Product removed Successfully ", StatusCode = 200 };
+            return new Response { IsDone = true, Message = "Product removed Successfully ", StatusCode = 200 };
         }
 
 
@@ -383,15 +424,13 @@ namespace ServiceLayer.ApplicationUserServices
                 .GroupBy(psc => psc.Product)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
-                .Take(20).ToListAsync(); 
-
+                .Take(20).ToListAsync();
             if (bestSellingProduct == null)
             {
-                return new Response { Message = "No products found." , StatusCode=404, IsDone=false };
+                return new Response { Message = "No products found.", StatusCode = 404, IsDone = false };
             }
-
-            var result =  _mapper.Map<List<ProductDto>>(bestSellingProduct);
-            return new Response { IsDone=true, StatusCode = 200 , Model=result};
+            var result = _mapper.Map<List<ProductDto>>(bestSellingProduct);
+            return new Response { IsDone = true, StatusCode = 200, Model = result };
         }
 
 
@@ -416,7 +455,7 @@ namespace ServiceLayer.ApplicationUserServices
                 .Select(u => u.User)
                 .ToList();
             var result = _mapper.Map<List<ApplicationUserDto>>(bestSellers);
-          return new Response { Model = result , IsDone=true , StatusCode=200};
+            return new Response { Model = result, IsDone = true, StatusCode = 200 };
         }
 
 
@@ -424,25 +463,21 @@ namespace ServiceLayer.ApplicationUserServices
         // give rate to seller 
         public async Task<Response> GiveRateToSeller(string userId, string sellerId, int rate)
         {
-            var user= await _userManager.FindByEmailAsync(userId);
-
-            if ((rate<0||rate>5))
+            var user = await _userManager.FindByEmailAsync(userId);
+            if ((rate < 0 || rate > 5))
             {
-                return new Response { Message = "Rate must be between 1 and 5." , StatusCode=400 , IsDone=false};
+                return new Response { Message = "Rate must be between 1 and 5.", StatusCode = 400, IsDone = false };
             }
             // Find the user who is giving the rate
             if (user == null)
             {
                 return new Response { Message = "User not found.", StatusCode = 404, IsDone = false };
-
-               
             }
             // Find the seller who is being rated
             var seller = await _context.Users.FindAsync(sellerId);
             if (seller == null || seller.UserType != UserType.Seller)
             {
                 return new Response { Message = "Seller not found.", StatusCode = 404, IsDone = false };
-
             }
             // Check if the user has added any product from the seller to their shopping cart
             var hasProductInCart = await _context.product_Shoppingcarts
@@ -456,18 +491,18 @@ namespace ServiceLayer.ApplicationUserServices
             seller.NumberOfRates++;
             await _context.SaveChangesAsync();
             var result = _mapper.Map<Service_ProviderDto>(seller);
-            return new Response { StatusCode=200, Model=result, IsDone = true };
+            return new Response { StatusCode = 200, Model = result, IsDone = true };
         }
 
 
 
         // update personal data 
-        public async Task<Response> UpdateUserData(string userEmail,UpdateApplicationUserDataDto applicationUserDto)
+        public async Task<Response> UpdateUserData(string userEmail, UpdateApplicationUserDataDto applicationUserDto)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
-                return new Response {Message = "User not found for update.", StatusCode = 404, IsDone = false };
+                return new Response { Message = "User not found for update.", StatusCode = 404, IsDone = false };
             }
             user.Name = applicationUserDto.Name;
             user.PhoneNumber = applicationUserDto.PhoneNumber;
@@ -477,12 +512,12 @@ namespace ServiceLayer.ApplicationUserServices
             user.available = false;
             user.Isbanned = false;
             await _context.SaveChangesAsync();
-            var  result =_mapper.Map<ApplicationUserDto>(user);
-            return new Response { StatusCode=200,Model=result, IsDone = true };
+            var result = _mapper.Map<ApplicationUserDto>(user);
+            return new Response { StatusCode = 200, Model = result, IsDone = true };
         }
-
-       
     }
+       
+   
 }
 
 

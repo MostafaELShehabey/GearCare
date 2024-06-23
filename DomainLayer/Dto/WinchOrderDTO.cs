@@ -1,4 +1,5 @@
 ﻿
+using DomainLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -12,8 +13,8 @@ namespace DomainLayer.Dto
     public class WinchOrderDTO
     {
         public string Id { get; set; }
-        public int Price { get; set; }
         public DateTime Date { get; set; }
         public Status Status { get; set; }
+        public WinchDriver winchDriver { get; set; }
     }
 }

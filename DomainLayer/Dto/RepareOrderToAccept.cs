@@ -13,7 +13,10 @@ namespace DomainLayer.Dto
         public string OrderId { get; set; }
 
         public string ClientId { get; set; }
-        public double Price { get; set; }
+        public string ServiceProviderId { get; set; }
+
+
+       // public double Price { get; set; }
 
         public DateTime? Date { get; set; }
 

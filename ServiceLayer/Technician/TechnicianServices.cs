@@ -118,8 +118,9 @@ namespace ServiceLayer.Technician
             }
 
             var orders = await _context.RepareOrders
-                .Where(x => x.ClientId == user.Id && x.Status == Status.PendingApproval)
+                .Where(x => x.ServiceProviderId == user.Id && x.Status == Status.PendingApproval)
                 .ToListAsync();
+
 
             var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
             return new Response { Model = result, StatusCode = 200 };
@@ -133,7 +134,7 @@ namespace ServiceLayer.Technician
                 return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
-            var order = await _context.RepareOrders.FirstOrDefaultAsync(sp => sp.ClientId == user.Id && sp.OrderId == orderId);
+            var order = await _context.RepareOrders.FirstOrDefaultAsync(sp => sp.ServiceProviderId == user.Id && sp.OrderId == orderId);
             if (order == null)
             {
                 return new Response { Message = "This user ID or order ID does not exist.", StatusCode = 404, IsDone = false };
@@ -155,7 +156,7 @@ namespace ServiceLayer.Technician
                     user.available = true;
                     break;
                 case OrderAction.Completed:
-                    order.Status = Status.Comlpeted;
+                    order.Status = Status.Completed;
                     user.available = true;
                     break;
                 default:
@@ -196,11 +197,11 @@ namespace ServiceLayer.Technician
                 return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
-            var query = _context.RepareOrders.Where(x => x.ClientId == user.Id);
+            var query = _context.RepareOrders.Where(x => x.ServiceProviderId == user.Id);
 
             if (orderBy == Enums.OrderBy.status)
             {
-                query = query.OrderBy(x => x.Status == Status.Comlpeted)
+                query = query.OrderBy(x => x.Status == Status.Completed)
                              .ThenBy(x => x.Status == Status.inProgress)
                              .ThenBy(x => x.Status == Status.PendingApproval)
                              .ThenBy(x => x.Status == Status.Cancelled);

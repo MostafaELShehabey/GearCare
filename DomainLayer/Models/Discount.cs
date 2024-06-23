@@ -13,7 +13,7 @@ namespace DomainLayer.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string id { get; set; }
-        public double ?Persentage { get; set; } 
+        public double Persentage { get; set; } 
         public ICollection<Product>? Product { get; set; }
     }
 }

@@ -18,14 +18,15 @@ namespace DomainLayer.Models
         public string Id { get; set; } 
         public string Name { get; set; }
         public List<string> ?PictureURL { get; set; }
-        public double ?price { get; set; }
-        public double? newPrice { get; set; } = 0;
+        public double price { get; set; }
+        public double newPrice { get; set; } 
         public string? Description { get; set; }
         public bool instock { get; set; }
         public bool deleted { get; set; } 
         public string SellerId { get; set; }
-        public string? Categoryid { get; set; }
-
+        public string CategoryName { get; set; }
+        public int Quantity { get; set; }
+     
         public ApplicationUser Seller { get; set; }        
         public Discount ?Discount { get; set; }
         public Category ?Categorys { get; set; }

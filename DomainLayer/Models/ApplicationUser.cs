@@ -45,7 +45,9 @@ namespace DomainLayer.Models
         public ICollection<RepareOrder_ApplicationUser> RepairOrder { get; set; }
         public ShoppingCart ShoppingCart { get; set; }
         public ICollection<Product> Products { get; set; }
-        public ICollection<WinchOrder> WinchOrders { get; set; }
+        public ICollection<WinchOrder> ClientOrders { get; set; }
+        public ICollection<WinchOrder> DriverOrders { get; set; }
+       // public ICollection<WinchOrder_ApplicationUser> WinchOrders { get; set; }
     }
 }
 

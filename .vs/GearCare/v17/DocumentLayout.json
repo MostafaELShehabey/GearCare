@@ -1,19 +1,41 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "F:\\\u0631\u0627\u0628\u0639\u0629 \u062D\u0627\u0633\u0628\u0627\u062A_4\\\u0627\u0644\u062A\u0631\u0645 \u0627\u0644\u062A\u0627\u0646\u064A\\Graduation project\\GearCareBackend\\GearCare\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|F:\\\u0631\u0627\u0628\u0639\u0629 \u062D\u0627\u0633\u0628\u0627\u062A_4\\\u0627\u0644\u062A\u0631\u0645 \u0627\u0644\u062A\u0627\u0646\u064A\\Graduation project\\GearCareBackend\\GearCare\\GearCareAPI\\Controllers\\SellerController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:GearCareAPI\\Controllers\\SellerController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
-      "Orientation": 0,
+      "Orientation": 1,
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "DockedHeight": 170,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:128:0:{75188d03-9892-4ae2-abf1-207126247ce5}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SellerController.cs",
+              "DocumentMoniker": "F:\\\u0631\u0627\u0628\u0639\u0629 \u062D\u0627\u0633\u0628\u0627\u062A_4\\\u0627\u0644\u062A\u0631\u0645 \u0627\u0644\u062A\u0627\u0646\u064A\\Graduation project\\GearCareBackend\\GearCare\\GearCareAPI\\Controllers\\SellerController.cs",
+              "RelativeDocumentMoniker": "GearCareAPI\\Controllers\\SellerController.cs",
+              "ToolTip": "F:\\\u0631\u0627\u0628\u0639\u0629 \u062D\u0627\u0633\u0628\u0627\u062A_4\\\u0627\u0644\u062A\u0631\u0645 \u0627\u0644\u062A\u0627\u0646\u064A\\Graduation project\\GearCareBackend\\GearCare\\GearCareAPI\\Controllers\\SellerController.cs",
+              "RelativeToolTip": "GearCareAPI\\Controllers\\SellerController.cs",
+              "ViewState": "AQIAAK4AAAAAAAAAAAAAALwAAAA4AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-21T14:19:01.22Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
             },
             {
               "$type": "Bookmark",
@@ -22,9 +44,13 @@
           ]
         },
         {
-          "DockedWidth": 272,
+          "DockedHeight": 109,
           "SelectedChildIndex": -1,
           "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:1:0:{d212f56b-c48a-434c-a121-1c5d80b59b9f}"

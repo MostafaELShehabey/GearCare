@@ -14,11 +14,11 @@ namespace ServiceLayer
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions options) : base(options) { }
-           
+
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<RepareOrder_ApplicationUser> RepairOrder_ApplicationUsers { get; set; }  
+       // public DbSet<RepareOrder_ApplicationUser> RepairOrder_ApplicationUsers { get; set; }
         public DbSet<RepareOrder> RepareOrders { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Photo> photos { get; set; }
@@ -30,20 +30,23 @@ namespace ServiceLayer
         public DbSet<Discount> discounts { get; set; }
 
 
-        //protected override void OnModelCreating(ModelBuilder builder)
-        //{
-        //    base.OnModelCreating(builder);
-        //    builder.Entity<ApplicationUser>()
-        //        .HasOne(o => o.photo)
-        //        .WithOne(p => p.user)
-        //        .HasForeignKey<Photo>(c => c.userid);
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
 
-        //    builder.Entity<Product>()
-        //    .HasMany(p => p.Photos)
-        //    .WithOne(photo => photo.Product)
-        //    .HasForeignKey(photo => photo.photoURL);
-        //}
+            builder.Entity<WinchOrder>()
+         .HasOne(wo => wo.Driver)
+         .WithMany(u => u.DriverOrders)
+         .HasForeignKey(wo => wo.DriverId)
+         .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<WinchOrder>()
+                .HasOne(wo => wo.Client)
+                .WithMany(u => u.ClientOrders)
+                .HasForeignKey(wo => wo.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+        }
 
     }
-
 }
