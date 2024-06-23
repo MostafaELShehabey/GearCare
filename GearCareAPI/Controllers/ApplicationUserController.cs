@@ -93,6 +93,21 @@ namespace GearCareAPI.Controllers
             }
         }
 
+        [HttpPost("CreateWinchOrder")]
+        public async Task<IActionResult> CreateWinchOrder([FromForm] RepareOrderDto repareOrderDto)
+        {
+            try
+            {
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var order = await _applicationUserService.CreateWinchOrder(userEmail, repareOrderDto);
+                return Ok(order);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"internal server error  {ex.Message}");
+            }
+        }
+
         [HttpGet("GetAllProducts")]
         public async Task<IActionResult> GetAllProducts(string? search)
         {

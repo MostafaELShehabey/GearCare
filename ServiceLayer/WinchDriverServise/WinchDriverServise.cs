@@ -153,6 +153,7 @@ namespace ServiceLayer.WinchDriverServise
                 return new Response { Message = "This user ID or order ID does not exist.", StatusCode = 404, IsDone = false };
             }
 
+
             // Handle the action
             switch (action)
             {
@@ -177,15 +178,19 @@ namespace ServiceLayer.WinchDriverServise
             }
 
             // Create result DTO
-            var result = new WinchDriverDto
+            var result = new WinchOrderToAccept
             {
-                Name = order.Driver.Name,
-                Location = order.Driver.Location,
-                Number = order.Driver.PhoneNumber,
-                Spezilization = order.Driver.Spezilization,
-                winchModel = user.WinchDriver.Winch.Model
+                OrderId = order.Id,
+                ClientId = order.ClientId,
+                Date = order.Date,
+                ProblemDescription = order.ProblemDescription,
+                DriverId = user.Id,
+                cartype=order.cartype,
+                location=order.location,
+                Status = order.Status
             };
-           
+
+
             // Save changes to the database
             await _context.SaveChangesAsync();
 
