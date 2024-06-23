@@ -13,7 +13,7 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedHeight": 170,
+          "DockedHeight": 250,
           "SelectedChildIndex": 1,
           "Children": [
             {
@@ -35,16 +35,12 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
-            },
-            {
-              "$type": "Bookmark",
               "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             }
           ]
         },
         {
-          "DockedHeight": 109,
+          "DockedHeight": 29,
           "SelectedChildIndex": -1,
           "Children": [
             {

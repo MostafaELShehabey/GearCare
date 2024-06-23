@@ -34,6 +34,10 @@ namespace ServiceLayer.Mapping
             CreateMap<WinchDto, Winch>().ReverseMap();
             CreateMap<WinchOutputDTO, Winch>().ReverseMap();
             CreateMap<WinchOrder, WinchOrderDTO>().ReverseMap();
+            
+            
+            CreateMap<WinchOrder, RepaireOrderOutDto>().ReverseMap();
+            CreateMap<WinchOrder, RepareOrderToAccept>().ReverseMap();
 
             CreateMap<DiscountDto, Discount>().ForMember(des => des.Product, o => o.Ignore());
             CreateMap<Discount, DiscountDto>();

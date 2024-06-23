@@ -23,6 +23,9 @@ namespace ServiceLayer.ApplicationUserServices
 
         //Create a repair order.
         Task<Response> CreateRepareOrder(string userId ,RepareOrderDto repareOrderDto);
+        Task<Response> CreateWinchOrder(string userEmail, RepareOrderDto repareOrderDto);
+
+
 
         //Get all products(optionally filtered by search criteria)
         Response GetAllProducts(string? search);

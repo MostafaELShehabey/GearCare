@@ -206,7 +206,13 @@ namespace ServiceLayer.ApplicationUserServices
                 ClientId = user.Id,
                 Date = DateTime.Now,
                 DriverId = driver.Id,
-                Status = Status.PendingApproval
+                Status = Status.PendingApproval,
+                Driver = driver,
+                Client=user,
+                cartype= repareOrderDto.cartype,
+                location=repareOrderDto.location,
+                ProblemDescription=repareOrderDto.ProblemDescription
+
             };
 
             // Add the order to the context
@@ -214,7 +220,42 @@ namespace ServiceLayer.ApplicationUserServices
             await _context.SaveChangesAsync();
 
             // Map the order to the output DTO
-            var result = _mapper.Map<RepaireOrderOutDto>(order);
+            var result = new WinchOrderOutDto 
+            { 
+                OrderId = order.Id,
+                ClientId = user.Id,
+                DriverId=driver.Id,
+                Client = new SellerDto
+                {
+                   Id = user.Id,
+                   Name = user.Name,
+                   Location = user.Location,
+                   PhotoId = user.PhotoId,
+                   Available = true ,
+                   Specialization = user.Spezilization,
+                   NumberOfRates = user.NumberOfRates,
+                   UserType = user.UserType
+                },
+                Driver = new SellerDto
+                {
+                   Id = driver.Id,
+                   Name = driver.Name,
+                   Location = driver.Location,
+                   PhotoId = driver.PhotoId,
+                   Available = true ,
+                   Specialization = driver.Spezilization,
+                   NumberOfRates = driver.NumberOfRates,
+                   Rate=driver.Rate,
+                   UserType = driver.UserType
+                }
+                ,Date = DateTime.Now,
+                ProblemDescription = order.ProblemDescription,
+                cartype = order.cartype,
+                location = order.location,
+                Status = order.Status
+
+
+            };
 
             // Return the response
             return new Response { IsDone = true, Model = result, StatusCode = 200 };
