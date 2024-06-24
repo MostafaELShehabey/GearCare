@@ -13,7 +13,10 @@ namespace DomainLayer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
         [ForeignKey("productId")]
-        public string ProductId { get; set; }
+        public string ProductId { get; set; } 
+        
+      //  public bool inCartFlag { get; set; }= false;    
+
 
         [ForeignKey("ShoppingCartId")]
         public string ShoppingcartId { get; set; }

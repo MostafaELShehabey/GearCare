@@ -43,6 +43,7 @@ namespace ServiceLayer.ApplicationUserServices
         Task<Response> AddProductToShoppingCart(string userId, string productId);
 
          Task<Response> RemoveProductFromShoppingCart(string userId, string productId);
+         Task<Response> CheckProductInShoppingCart(string userId, string productId);
 
         // Get the best-selling product.
         Task<Response> GetBestSellingProduct();

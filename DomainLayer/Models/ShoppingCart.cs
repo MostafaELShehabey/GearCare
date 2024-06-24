@@ -14,25 +14,24 @@ namespace DomainLayer.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
-        public int TotalPrice { get; set; }
+       
+       // public bool flag { get; set; }=false;
+        
         //Foreign Keys
         [ForeignKey("Client")]
         public string ClientId { get; set; }
+       
         //Foreign Keys
         [ForeignKey("Product")]
         public string ProductId { get; set; }
         
         // Navigation Properties
-        //[JsonIgnore]
-        //[IgnoreDataMember]
         public ApplicationUser Client { get; set; }
        
         // Navigation Properties
-        //[JsonIgnore]
-        //[IgnoreDataMember]
         public ICollection<Product_Shoppingcart> product_Shoppingcart { get; set; }
 
-        //public Product Products { get; set; }
+       
     }
 }
 

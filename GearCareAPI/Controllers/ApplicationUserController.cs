@@ -198,6 +198,23 @@ namespace GearCareAPI.Controllers
             }
         }
 
+
+        [HttpGet("CheckProductInShoppingCart/{productId}")]
+        public async Task<IActionResult> CheckProductInShoppingCart(string productId)
+        {
+            try
+            {
+                var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+               var result= await _applicationUserService.CheckProductInShoppingCart(userEmail, productId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"internal server error  {ex.Message}");
+            }
+        }
+
         [HttpGet("GetBestSellingProduct")]
         public async Task<IActionResult> GetBestSellingProduct()
         {
