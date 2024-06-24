@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DomainLayer.Dto;
-using static DomainLayer.Helpers.Enums;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using DomainLayer.Helpers;
 
 namespace ServiceLayer.WinchDriverService
 {
@@ -78,9 +78,10 @@ namespace ServiceLayer.WinchDriverService
             }
         }
 
+
         // Endpoint for getting order history
         [HttpGet("GetOrdersHistory")]
-        public async Task<IActionResult> GetOrdersHistory([FromQuery] OrderBy orderBy)
+        public async Task<IActionResult> GetOrdersHistory([FromQuery] Enums.OrderBy orderBy)
         {
             try
             {
@@ -92,6 +93,32 @@ namespace ServiceLayer.WinchDriverService
 
                 var response = await _winchDriverService.GetOrdersHistory(userEmail, orderBy);
                 return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("CurrentOrder")]
+        public async Task<IActionResult> CurrentOrder(Enums.OrderBy orderBy)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { Message = "User ID not found in token." });
+                }
+
+                var userEmail = userIdClaim.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return Unauthorized(new { Message = "User ID is empty." });
+                }
+
+                var orders = await _winchDriverService.CurrentOrder(userEmail, orderBy);
+                return Ok(orders);
             }
             catch (Exception ex)
             {

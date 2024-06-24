@@ -15,13 +15,13 @@ namespace DomainLayer.Dto
         public string ClientId { get; set; }
         public string ServiceProviderId { get; set; }
 
-
-       // public double Price { get; set; }
-
         public DateTime? Date { get; set; }
 
         public string ProblemDescription { get; set; }
 
         public Status Status { get; set; }
+        public string ClientName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string ClientPhoto { get; set; }
     }
 }

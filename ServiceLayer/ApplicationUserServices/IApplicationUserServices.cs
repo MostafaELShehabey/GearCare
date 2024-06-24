@@ -16,7 +16,7 @@ namespace ServiceLayer.ApplicationUserServices
 
         // Get a list of available service providers based on type, location, and car type.
         Task<Response> GetServiceProviderAvailable(UserType userType, string? location, string? Cartype, string userEmail);
-        Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype);
+      //  Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype);
 
         //Get list of sellers.
         Task<Response> GetSellers(string? location);
@@ -43,6 +43,7 @@ namespace ServiceLayer.ApplicationUserServices
         Task<Response> AddProductToShoppingCart(string userId, string productId);
 
          Task<Response> RemoveProductFromShoppingCart(string userId, string productId);
+         Task<Response> CheckProductInShoppingCart(string userId, string productId);
 
         // Get the best-selling product.
         Task<Response> GetBestSellingProduct();

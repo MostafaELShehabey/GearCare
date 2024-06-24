@@ -71,10 +71,10 @@ namespace ServiceLayer.ApplicationUserServices
                     query = query.Where(sp => sp.Location.ToLower().Contains(location.ToLower()));
                 }
 
-                if (!string.IsNullOrEmpty(Cartype))
-                {
-                    query = query.Where(sp => sp.WinchDriver.Winch.Model.ToLower().Contains(Cartype.ToLower()));
-                }
+                //if (!string.IsNullOrEmpty(Cartype))
+                //{
+                //    query = query.Where(sp => sp.WinchDriver.Winch.Model.ToLower().Contains(Cartype.ToLower()));
+                //}
 
                 var winchDrivers = await query
                     .Select(driver => new WinchDriverOUTDto
@@ -120,15 +120,7 @@ namespace ServiceLayer.ApplicationUserServices
         }
 
 
-        //Get winch driver avalable
-        public Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-
+  
 
         // get list of sellers  
         public async Task<Response> GetSellers(string? location)
@@ -172,13 +164,17 @@ namespace ServiceLayer.ApplicationUserServices
                 location = repareOrderDto.location,
                 ProblemDescription = repareOrderDto.ProblemDescription,
                 ServiceProviderId = serviceProvider.Id,
-                //Client = serviceProvider
+                ClientName = user.Name,
+                ClientPhoto=user.PhotoId,
+                PhoneNumber=user.PhoneNumber
+               
+                
 
             };
 
             await _context.RepareOrders.AddAsync(repareOrder);
             await _context.SaveChangesAsync();
-            var result = _mapper.Map<RepaireOrderOutDto>(repareOrder);
+            var result = _mapper.Map<RepareOrderToAccept>(repareOrder);
             return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
 
@@ -401,6 +397,7 @@ namespace ServiceLayer.ApplicationUserServices
                 {
                     ClientId = user.Id,
                     ProductId = productId
+                   
                 };
                 _context.ShoppingCarts.Add(shoppingCart);
                 await _context.SaveChangesAsync();
@@ -410,6 +407,7 @@ namespace ServiceLayer.ApplicationUserServices
             {
                 ShoppingCart = shoppingCart, // Use navigation property
                 ProductId = productId
+                   
             };
             _context.product_Shoppingcarts.Add(productShoppingCart);
             await _context.SaveChangesAsync();
@@ -428,32 +426,43 @@ namespace ServiceLayer.ApplicationUserServices
             {
                 return new Response { Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
             }
+
             // Validate product ID
             var product = await _context.Products.FindAsync(productId);
             if (product == null)
             {
                 return new Response { Message = "The provided product ID is incorrect or the product does not exist.", StatusCode = 404, IsDone = false };
             }
+
             // Get the user's shopping cart
             var shoppingCart = await _context.ShoppingCarts
-                .Include(sc => sc.Client)
                 .Include(sc => sc.product_Shoppingcart)
-                .FirstOrDefaultAsync(sc => sc.Client.Id == user.Id);
+                .ThenInclude(psc => psc.Product)
+                .FirstOrDefaultAsync(sc => sc.ClientId == user.Id);
             if (shoppingCart == null)
             {
                 return new Response { Message = "Shopping cart not found.", StatusCode = 404, IsDone = false };
             }
+
+            if (shoppingCart.product_Shoppingcart == null)
+            {
+                return new Response { Message = "Shopping cart is empty.", StatusCode = 404, IsDone = false };
+            }
+
             // Find the product in the shopping cart
             var productShoppingCart = shoppingCart.product_Shoppingcart
                 .FirstOrDefault(psc => psc.Product.Id == productId);
             if (productShoppingCart == null)
             {
-                return new Response { Message = "This product not Exist in your shopping cart.", StatusCode = 404, IsDone = false };
+                return new Response { Message = "This product does not exist in your shopping cart.", StatusCode = 404, IsDone = false };
             }
+
             // Remove the product from the shopping cart
             shoppingCart.product_Shoppingcart.Remove(productShoppingCart);
+            _context.product_Shoppingcarts.Remove(productShoppingCart);  
             await _context.SaveChangesAsync();
-            return new Response { IsDone = true, Message = "Product removed Successfully ", StatusCode = 200 };
+
+            return new Response { IsDone = true, Message = "Product removed successfully.", StatusCode = 200 };
         }
 
 
@@ -555,6 +564,49 @@ namespace ServiceLayer.ApplicationUserServices
             await _context.SaveChangesAsync();
             var result = _mapper.Map<ApplicationUserDto>(user);
             return new Response { StatusCode = 200, Model = result, IsDone = true };
+        }
+
+        public async Task<Response> CheckProductInShoppingCart(string userEmail, string productId)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                return new Response { Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
+            }
+
+            // Validate product ID
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null)
+            {
+                return new Response { Message = "The provided product ID is incorrect or the product does not exist.", StatusCode = 404, IsDone = false };
+            }
+
+            // Get the user's shopping cart
+            var shoppingCart = await _context.ShoppingCarts
+                .Include(sc => sc.product_Shoppingcart)
+                .ThenInclude(psc => psc.Product)
+                .FirstOrDefaultAsync(sc => sc.ClientId == user.Id);
+            if (shoppingCart == null)
+            {
+                return new Response { Message = "Shopping cart not found.", StatusCode = 404, IsDone = false };
+            }
+
+            if (shoppingCart.product_Shoppingcart == null)
+            {
+                return new Response { Message = "Shopping cart is empty.", StatusCode = 404, IsDone = false };
+            }
+
+            // Find the product in the shopping cart
+            var productShoppingCart = shoppingCart.product_Shoppingcart
+                .FirstOrDefault(psc => psc.ProductId == productId);
+            if (productShoppingCart == null)
+            {
+                return new Response { Message = "False", StatusCode = 200, IsDone = false };
+            }
+            return new Response { Message = "True", StatusCode = 404, IsDone = true };
+
+
+           
         }
     }
        

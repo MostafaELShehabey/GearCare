@@ -15,7 +15,7 @@ namespace ServiceLayer.SellerServices
         Task<Response> DeleteProductPhoto(string productId, string photoUrl, string userEmail);
         Task<Response> AddProduct(ProductDto productDto, IFormFileCollection images, string userEmail);
         Task<Response> UpdateProduct(string productId, ProductDto productDto);
-        Task< Response >DeleteProduct(string productId);
+        Task<Response>DeleteProduct(string productId);
 
         Task<Response> MakeDiscount(DiscountDto discountDto);
         Response GetMyDiscounts();

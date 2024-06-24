@@ -16,8 +16,8 @@ namespace DomainLayer.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public string Id { get; set; }
        
-        [Range(0,5)]
-        public int Rate { get; set; }
+       // [Range(0,5)]
+       // public int Rate { get; set; }
         public DateTime Date { get; set; }
         public Status Status { get; set; }
      

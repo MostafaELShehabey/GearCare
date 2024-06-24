@@ -33,6 +33,10 @@ namespace DomainLayer.Models
 
         public Status Status { get; set; }
 
+        public string ClientName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string? ClientPhoto { get; set; }
+
         //Navigation Properity 
         public RepareOrder_ApplicationUser? User { get; set; }
 

@@ -1,11 +1,7 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\GearCareAPI",
-    "\\GearCareAPI\\Controllers",
-    "\\ServiceLayer",
-    "\\ServiceLayer\\SellerServices"
+    ""
   ],
-  "SelectedNode": "\\GearCareAPI\\appsettings.json",
+  "SelectedNode": "\\GearCareAPI.sln",
   "PreviewInSolutionExplorer": false
 }
