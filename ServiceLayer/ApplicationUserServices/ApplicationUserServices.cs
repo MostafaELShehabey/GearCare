@@ -71,10 +71,10 @@ namespace ServiceLayer.ApplicationUserServices
                     query = query.Where(sp => sp.Location.ToLower().Contains(location.ToLower()));
                 }
 
-                if (!string.IsNullOrEmpty(Cartype))
-                {
-                    query = query.Where(sp => sp.WinchDriver.Winch.Model.ToLower().Contains(Cartype.ToLower()));
-                }
+                //if (!string.IsNullOrEmpty(Cartype))
+                //{
+                //    query = query.Where(sp => sp.WinchDriver.Winch.Model.ToLower().Contains(Cartype.ToLower()));
+                //}
 
                 var winchDrivers = await query
                     .Select(driver => new WinchDriverOUTDto
@@ -120,15 +120,7 @@ namespace ServiceLayer.ApplicationUserServices
         }
 
 
-        //Get winch driver avalable
-        public Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype)
-        {
-            throw new NotImplementedException();
-        }
-
-
-
-
+  
 
         // get list of sellers  
         public async Task<Response> GetSellers(string? location)

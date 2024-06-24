@@ -241,13 +241,13 @@ namespace ServiceLayer.WinchDriverServise
                                       .ThenBy(x => x.Status == Status.inProgress)
                                       .ThenBy(x => x.Status == Status.PendingApproval)
                                       .ThenBy(x => x.Status == Status.Cancelled).ToList();
-                var result = _mapper.Map<List<WinchOrderDTO>>(myorder);
+                var result = _mapper.Map<List<RepareOrderToAccept>>(myorder);
                 return new Response { StatusCode = 200, Model = result };
             }
             else
             {
                 var myorder = _context.WinchOrders.OrderBy(x => x.Date);
-                var result = _mapper.Map<List<WinchOrderDTO>>(myorder);
+                var result = _mapper.Map<List<RepareOrderToAccept>>(myorder);
                 return new Response { Model = result, StatusCode = 200 };
             }
 
@@ -272,6 +272,9 @@ namespace ServiceLayer.WinchDriverServise
             return new Response { Model = result, StatusCode = 200, Message = "your data is updated successfully " };
         }
 
-
+        public Task<Response> CurrentOrder(string userEmail, Enums.OrderBy orderBy)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

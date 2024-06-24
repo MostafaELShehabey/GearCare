@@ -16,7 +16,7 @@ namespace ServiceLayer.ApplicationUserServices
 
         // Get a list of available service providers based on type, location, and car type.
         Task<Response> GetServiceProviderAvailable(UserType userType, string? location, string? Cartype, string userEmail);
-        Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype);
+      //  Task<Response> GetAvailableWinchDriver(UserType userType, string location, string Cartype);
 
         //Get list of sellers.
         Task<Response> GetSellers(string? location);

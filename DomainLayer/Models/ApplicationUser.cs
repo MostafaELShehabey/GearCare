@@ -38,8 +38,8 @@ namespace DomainLayer.Models
 
        
         //navigation properity 
-        [ForeignKey("userphotoId")]
-        public Photo photo { get; set; }
+       // [ForeignKey("userphotoId")]
+        //public Photo photo { get; set; }
         public WinchDriver WinchDriver { get; set; }
         [JsonIgnore]
         public ICollection<RepareOrder_ApplicationUser> RepairOrder { get; set; }
@@ -47,7 +47,7 @@ namespace DomainLayer.Models
         public ICollection<Product> Products { get; set; }
         public ICollection<WinchOrder> ClientOrders { get; set; }
         public ICollection<WinchOrder> DriverOrders { get; set; }
-       // public ICollection<WinchOrder_ApplicationUser> WinchOrders { get; set; }
+       
     }
 }
 

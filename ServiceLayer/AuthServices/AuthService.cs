@@ -118,7 +118,7 @@ namespace ServiceLayer.AuthServices
                     User = _mapper.Map<CompleteUserDataDTO>(user),
                     IsAuthenticated = true,
                     Roles = new List<string> { role },
-                    Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
+                    Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken)
                 };
 
             }

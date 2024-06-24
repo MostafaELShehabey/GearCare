@@ -114,6 +114,32 @@ namespace GearCareAPI.Controllers
             }
         }
 
+        [HttpGet("CurrentOrder")]
+        public async Task<IActionResult> CurrentOrder(Enums.OrderBy orderBy)
+        {
+            try
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Unauthorized(new { Message = "User ID not found in token." });
+                }
+
+                var userEmail = userIdClaim.Value;
+                if (string.IsNullOrEmpty(userEmail))
+                {
+                    return Unauthorized(new { Message = "User ID is empty." });
+                }
+
+                var orders = await _technicianService.CurrentOrder(userEmail, orderBy);
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPost("HandleOrderAction")]
         public async Task<IActionResult> HandleOrderAction([FromForm] OrderActionRequest request)
         {

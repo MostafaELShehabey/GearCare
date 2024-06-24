@@ -122,8 +122,8 @@ namespace ServiceLayer.Technician
                 .ToListAsync();
 
 
-            var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
-            return new Response { Model = result, StatusCode = 200 };
+            var result = _mapper.Map<List<RepareOrderToAccept>>(orders); 
+            return new Response { Model = orders, StatusCode = 200 };
         }
 
         public async Task<Response> HandleOrderAction(string userEmail, string orderId, OrderAction action)
@@ -165,7 +165,20 @@ namespace ServiceLayer.Technician
 
             await _context.SaveChangesAsync();
 
-            var result = _mapper.Map<RepareOrderToAccept>(order);
+         // var result = _mapper.Map<RepareOrderToAccept>(order);
+            var client =_context.Users.Where(x=>x.Id==order.ClientId);
+            var result = new RepaireOrderOutDto
+            {
+                OrderId = orderId,
+                ClientId = order.ClientId,
+                ServiceProviderId = user.Id,
+                cartype = order.cartype,
+                location = order.location,
+                Date = order.Date,
+                Status = order.Status,
+                Client = _mapper.Map<SellerDto>(client)
+
+            };
             return new Response { Model = result, StatusCode = 200 };
         }
 
@@ -189,7 +202,7 @@ namespace ServiceLayer.Technician
             return new Response { Model = result, StatusCode = 200, Message = "Your data is updated successfully" };
         }
 
-        public async Task<Response> GetOrderHistory(string userEmail, Enums.OrderBy orderBy)
+        public async Task<Response> GetOrderHistory(string userEmail, Enums.OrderBy orderBy)//Return Canceled or Completed
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
             if (user == null)
@@ -197,13 +210,13 @@ namespace ServiceLayer.Technician
                 return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
-            var query = _context.RepareOrders.Where(x => x.ServiceProviderId == user.Id);
 
+            var query = _context.RepareOrders.Where(x => x.ServiceProviderId == user.Id && (x.Status == (Status.Completed) || (x.Status == Status.Cancelled)));
+
+            query.Select(x => x.User.applicationUsers);
             if (orderBy == Enums.OrderBy.status)
             {
                 query = query.OrderBy(x => x.Status == Status.Completed)
-                             .ThenBy(x => x.Status == Status.inProgress)
-                             .ThenBy(x => x.Status == Status.PendingApproval)
                              .ThenBy(x => x.Status == Status.Cancelled);
             }
             else
@@ -212,7 +225,41 @@ namespace ServiceLayer.Technician
             }
 
             var orders = await query.ToListAsync();
+
             var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
+            // var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
+
+           
+            return new Response { StatusCode = 200, Model = result };
+        }
+
+        public async Task<Response> CurrentOrder(string userEmail, Enums.OrderBy orderBy)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
+            if (user == null)
+            {
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
+            }
+
+
+            var query = _context.RepareOrders.Where(x => x.ServiceProviderId == user.Id && (x.Status == (Status.inProgress) || (x.Status == Status.PendingApproval)));
+
+            query.Select(x => x.User.applicationUsers);
+            if (orderBy == Enums.OrderBy.status)
+            {
+                query = query.OrderBy(x => x.Status == Status.inProgress)
+                             .ThenBy(x => x.Status == Status.PendingApproval);
+            }
+            else
+            {
+                query = query.OrderBy(x => x.Date);
+            }
+
+            var orders = await query.ToListAsync();
+
+            var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
+            // var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
+
 
             return new Response { StatusCode = 200, Model = result };
         }
