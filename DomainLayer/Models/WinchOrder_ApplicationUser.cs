@@ -15,7 +15,7 @@ namespace DomainLayer.Models
 
         [ForeignKey("UserId")]
         public string UserId { get; set; }
-        public WinchOrder winchOrder { get; set; }
+        public WinchOrder winch_Order { get; set; }
         public ApplicationUser user { get; set; }
     }
 }

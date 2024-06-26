@@ -13,40 +13,40 @@ namespace ServiceLayer
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options) { }
-
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-        public DbSet<Category> Categories { get; set; }
-       // public DbSet<RepareOrder_ApplicationUser> RepairOrder_ApplicationUsers { get; set; }
         public DbSet<RepareOrder> RepareOrders { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Photo> photos { get; set; }
-        public DbSet<Product_Shoppingcart> product_Shoppingcarts { get; set; }
+        public DbSet<Photo> Photos { get; set; }
+        public DbSet<Product_Shoppingcart> Product_Shoppingcarts { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<WinchDriver> WinchDrivers { get; set; }
         public DbSet<WinchOrder> WinchOrders { get; set; }
+        public DbSet<ApplicationUser_WinchOrder> ApplicationUser_WinchOrders { get; set; }
         public DbSet<Winch> Winchs { get; set; }
-        public DbSet<Discount> discounts { get; set; }
-
+        public DbSet<Category> categories { get; set; }
+        public DbSet<Discount> Discounts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<WinchOrder>()
-         .HasOne(wo => wo.Driver)
-         .WithMany(u => u.DriverOrders)
-         .HasForeignKey(wo => wo.DriverId)
-         .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ApplicationUser_WinchOrder>()
+                .HasKey(wo => wo.Id);
 
-            builder.Entity<WinchOrder>()
-                .HasOne(wo => wo.Client)
-                .WithMany(u => u.ClientOrders)
-                .HasForeignKey(wo => wo.ClientId)
-                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<ApplicationUser_WinchOrder>()
+                .HasOne(wo => wo.WinchOrder)
+                .WithMany(o => o.ApplicationUserWinchOrders)
+                .HasForeignKey(wo => wo.WinchOrderId)
+                .OnDelete(DeleteBehavior.NoAction);
 
+            builder.Entity<ApplicationUser_WinchOrder>()
+                .HasOne(wo => wo.ApplicationUser)
+                .WithMany(u => u.ApplicationUserWinchOrders)
+                .HasForeignKey(wo => wo.ApplicationUserId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
-
     }
+
 }

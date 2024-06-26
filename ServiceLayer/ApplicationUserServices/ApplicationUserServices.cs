@@ -183,13 +183,14 @@ namespace ServiceLayer.ApplicationUserServices
         // create winch order 
         public async Task<Response> CreateWinchOrder(string userEmail, RepareOrderDto repareOrderDto)
         {
-            var user = await _userManager.FindByEmailAsync(userEmail);
-            if (user is null)
+            // Find the client (user) by email
+            var client = await _userManager.FindByEmailAsync(userEmail);
+            if (client is null)
             {
                 return new Response { Message = $"Client with email {userEmail} was not found.", StatusCode = 404, IsDone = false };
             }
 
-            // Find the driver by the provided ServiceProviderId
+            // Find the driver by the provided ServiceProviderId (assuming repareOrderDto.ServiceProviderId is the driver's Id)
             var driver = await _context.Users.FirstOrDefaultAsync(x => x.Id == repareOrderDto.ServiceProvierId);
             if (driver is null)
             {
@@ -199,15 +200,16 @@ namespace ServiceLayer.ApplicationUserServices
             // Create a new winch order
             var order = new WinchOrder
             {
-                ClientId = user.Id,
+                ClientId = client.Id,
                 Date = DateTime.Now,
                 DriverId = driver.Id,
                 Status = Status.PendingApproval,
-                Driver = driver,
-                Client=user,
-                cartype= repareOrderDto.cartype,
-                location=repareOrderDto.location,
-                ProblemDescription=repareOrderDto.ProblemDescription
+                cartype = repareOrderDto.cartype,
+                location = repareOrderDto.location,
+                ProblemDescription = repareOrderDto.ProblemDescription,
+                ClientName = driver.Name,
+                ClientPhoto = driver.PhotoId,
+                PhoneNumber = driver.PhoneNumber
 
             };
 
@@ -215,48 +217,46 @@ namespace ServiceLayer.ApplicationUserServices
             await _context.WinchOrders.AddAsync(order);
             await _context.SaveChangesAsync();
 
-            // Map the order to the output DTO
-            var result = new WinchOrderOutDto 
-            { 
-                OrderId = order.Id,
-                ClientId = user.Id,
-                DriverId=driver.Id,
+            // Map the order and related entities to the output DTO
+            var result = new WinchOrderOutDto
+            {
+                OrderId = order.OrderId,
+                ClientId = client.Id,
+                DriverId = driver.Id,
                 Client = new SellerDto
                 {
-                   Id = user.Id,
-                   Name = user.Name,
-                   Location = user.Location,
-                   PhotoId = user.PhotoId,
-                   Available = true ,
-                   Specialization = user.Spezilization,
-                   NumberOfRates = user.NumberOfRates,
-                   UserType = user.UserType
+                    Id = client.Id,
+                    Name = client.Name,
+                    Location = client.Location,
+                    PhotoId = client.PhotoId,
+                    Available = client.available,
+                    Specialization = client.Spezilization,
+                    NumberOfRates = client.NumberOfRates,
+                    UserType = client.UserType
                 },
                 Driver = new SellerDto
                 {
-                   Id = driver.Id,
-                   Name = driver.Name,
-                   Location = driver.Location,
-                   PhotoId = driver.PhotoId,
-                   Available = true ,
-                   Specialization = driver.Spezilization,
-                   NumberOfRates = driver.NumberOfRates,
-                   Rate=driver.Rate,
-                   UserType = driver.UserType
-                }
-                ,Date = DateTime.Now,
+                    Id = driver.Id,
+                    Name = driver.Name,
+                    Location = driver.Location,
+                    PhotoId = driver.PhotoId,
+                    Available = driver.available,
+                    Specialization = driver.Spezilization,
+                    NumberOfRates = driver.NumberOfRates,
+                    Rate = driver.Rate,
+                    UserType = driver.UserType
+                },
+                Date = order.Date,
                 ProblemDescription = order.ProblemDescription,
                 cartype = order.cartype,
                 location = order.location,
                 Status = order.Status
-
-
             };
 
             // Return the response
             return new Response { IsDone = true, Model = result, StatusCode = 200 };
-
         }
+
 
 
         //get all product (randoum )
@@ -309,8 +309,10 @@ namespace ServiceLayer.ApplicationUserServices
             // Check if products were found
             if (products.Count() == 0 && !string.IsNullOrEmpty(search))
             {
+                var result = new List<ProductDto>();
                 return new Response
                 {
+                    Model = result,
                     IsDone = false,
                     Message = "The product does not exist, try to search with a different Name or Category!",
                     StatusCode = 404
@@ -342,7 +344,7 @@ namespace ServiceLayer.ApplicationUserServices
             {
                 return new Response { Message = "The provided user ID is incorrect or the user does not exist.", StatusCode = 404, IsDone = false };
             }
-            var productsInCart = await _context.product_Shoppingcarts
+            var productsInCart = await _context.Product_Shoppingcarts
             .Where(ps => ps.ShoppingCart.ClientId == user.Id)
             .Select(ps => ps.Product)
             .ToListAsync();
@@ -355,7 +357,7 @@ namespace ServiceLayer.ApplicationUserServices
         // Get all categories
         public async Task<Response> GetAllCategories()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _context.categories.ToListAsync();
             var result = _mapper.Map<List<CategoryDto>>(categories);
             return new Response { IsDone = true, Model = result, StatusCode = 200 };
         }
@@ -409,7 +411,7 @@ namespace ServiceLayer.ApplicationUserServices
                 ProductId = productId
                    
             };
-            _context.product_Shoppingcarts.Add(productShoppingCart);
+            _context.Product_Shoppingcarts.Add(productShoppingCart);
             await _context.SaveChangesAsync();
             return new Response { IsDone = true, Message = "Product added Successfully", StatusCode = 200 };
         }
@@ -459,7 +461,7 @@ namespace ServiceLayer.ApplicationUserServices
 
             // Remove the product from the shopping cart
             shoppingCart.product_Shoppingcart.Remove(productShoppingCart);
-            _context.product_Shoppingcarts.Remove(productShoppingCart);  
+            _context.Product_Shoppingcarts.Remove(productShoppingCart);  
             await _context.SaveChangesAsync();
 
             return new Response { IsDone = true, Message = "Product removed successfully.", StatusCode = 200 };
@@ -470,7 +472,7 @@ namespace ServiceLayer.ApplicationUserServices
         // Get the 20 best-selling product 
         public async Task<Response> GetBestSellingProduct()
         {
-            var bestSellingProduct = await _context.product_Shoppingcarts
+            var bestSellingProduct = await _context.Product_Shoppingcarts
                 .GroupBy(psc => psc.Product)
                 .OrderByDescending(g => g.Count())
                 .Select(g => g.Key)
@@ -530,7 +532,7 @@ namespace ServiceLayer.ApplicationUserServices
                 return new Response { Message = "Seller not found.", StatusCode = 404, IsDone = false };
             }
             // Check if the user has added any product from the seller to their shopping cart
-            var hasProductInCart = await _context.product_Shoppingcarts
+            var hasProductInCart = await _context.Product_Shoppingcarts
                 .AnyAsync(psc => psc.ShoppingCart.ClientId == userId && psc.Product.SellerId == sellerId);
             if (!hasProductInCart)
             {
@@ -608,6 +610,8 @@ namespace ServiceLayer.ApplicationUserServices
 
            
         }
+
+        
     }
        
    

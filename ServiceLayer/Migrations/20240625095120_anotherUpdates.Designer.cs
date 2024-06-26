@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServiceLayer;
 
@@ -11,9 +12,11 @@ using ServiceLayer;
 namespace ServiceLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240625095120_anotherUpdates")]
+    partial class anotherUpdates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -164,7 +167,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("WinchOrderId");
 
-                    b.ToTable("ApplicationUser_WinchOrders");
+                    b.ToTable("applicationUser_WinchOrders");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Category", b =>
@@ -185,7 +188,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("categories");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Discount", b =>
@@ -199,7 +202,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Discounts");
+                    b.ToTable("discounts");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Photo", b =>
@@ -220,7 +223,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("productID");
 
-                    b.ToTable("Photos");
+                    b.ToTable("photos");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Product", b =>
@@ -299,7 +302,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("ShoppingcartId");
 
-                    b.ToTable("Product_Shoppingcarts");
+                    b.ToTable("product_Shoppingcarts");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.RepareOrder", b =>
@@ -463,22 +466,10 @@ namespace ServiceLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ClientName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClientPhoto")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DriverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -506,7 +497,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("WinchDriverId");
 
-                    b.ToTable("WinchOrders");
+                    b.ToTable("WinchOrder");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

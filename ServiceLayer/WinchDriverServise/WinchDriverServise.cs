@@ -147,7 +147,7 @@ namespace ServiceLayer.WinchDriverServise
             }
 
             // Find the order by DriverId and orderId
-            var order = await _context.WinchOrders.FirstOrDefaultAsync(sp => sp.DriverId == user.Id && sp.Id == orderId);
+            var order = await _context.WinchOrders.FirstOrDefaultAsync(sp => sp.DriverId == user.Id && sp.OrderId == orderId);
             if (order == null)
             {
                 return new Response { Message = "This user ID or order ID does not exist.", StatusCode = 404, IsDone = false };
@@ -180,7 +180,7 @@ namespace ServiceLayer.WinchDriverServise
             // Create result DTO
             var result = new WinchOrderToAccept
             {
-                OrderId = order.Id,
+                OrderId = order.OrderId,
                 ClientId = order.ClientId,
                 Date = order.Date,
                 ProblemDescription = order.ProblemDescription,
@@ -228,30 +228,101 @@ namespace ServiceLayer.WinchDriverServise
         public async Task<Response> GetOrdersHistory(string userEmail, Enums.OrderBy orderBy)
         {
 
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
-            var userid = user.Id;
-            if (user == null)
+            var driver = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
+
+            if (driver == null)
             {
                 return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
+
+            var query = _context.WinchOrders.Where(x => x.DriverId == driver.Id);
+
+
             if (orderBy == Enums.OrderBy.status)
             {
-                var myorder = _context.WinchOrders.Where(x => x.DriverId == userid).
-                    OrderBy(x => x.Status == Status.Completed)
-                                      .ThenBy(x => x.Status == Status.inProgress)
-                                      .ThenBy(x => x.Status == Status.PendingApproval)
-                                      .ThenBy(x => x.Status == Status.Cancelled).ToList();
-                var result = _mapper.Map<List<RepareOrderToAccept>>(myorder);
-                return new Response { StatusCode = 200, Model = result };
+                query = query.OrderBy(x => x.Status == Status.Completed)
+                             .ThenBy(x => x.Status == Status.Cancelled);
             }
             else
             {
-                var myorder = _context.WinchOrders.OrderBy(x => x.Date);
-                var result = _mapper.Map<List<RepareOrderToAccept>>(myorder);
-                return new Response { Model = result, StatusCode = 200 };
+                query = query.OrderBy(x => x.Date);
             }
 
+            var orders = await query.ToListAsync();
+            foreach (var order in orders)
+            {
+                var clientid = order.ClientId;
+                var client = await _context.Users.FirstAsync(x => x.Id == clientid);
+                if (client == null)
+                {
+                    return new Response { Message = $"Invalid or non-existent user ID: {clientid}", StatusCode = 404, IsDone = false };
+                }
+
+                order.ClientId = client.Id;
+                order.ClientName = client.Name;
+                order.PhoneNumber = client.PhoneNumber;
+                order.ClientPhoto = client.PhotoId;
+                order.location = client.Location;
+                order.cartype = client.CarType;
+            }
+
+            var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
+            return new Response { StatusCode = 200, Model = result };
         }
+      
+
+
+
+
+        public async Task<Response> CurrentOrder(string userEmail, Enums.OrderBy orderBy)
+        {
+            var driver = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
+            if (driver == null)
+            {
+                return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
+            }
+
+
+            var query = _context.WinchOrders.Where(x => x.DriverId == driver.Id && x.Status == Status.inProgress);
+
+            query.Select(x => x.Client.ApplicationUserWinchOrders);
+            
+                query = query.OrderBy(x => x.Date);
+            
+
+            var orders = await query.ToListAsync();
+            foreach (var order in orders)
+            {
+                var clientid =  order.ClientId;
+                var client = await _context.Users.FirstAsync(x => x.Id == clientid);
+                if (client == null)
+                {
+                    return new Response { Message = $"Invalid or non-existent user ID: {clientid}", StatusCode = 404, IsDone = false };
+                }
+                order.ClientId = client.Id;
+                order.ClientName = client.Name;
+                order.PhoneNumber = client.PhoneNumber;
+                order.ClientPhoto = client.PhotoId;
+                order.location = client.Location;
+                order.cartype = client.CarType;
+            }
+            var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
+
+            // Return response with mapped DTO list
+            return new Response { StatusCode = 200, Model = result };
+
+        }
+
+
+
+
+
+
+
+
+
+
+
 
         public async Task<Response> UpdatePersonalData(string userEmail, WinchDriverDto driverDto, IFormFile photo)
         {
@@ -271,10 +342,6 @@ namespace ServiceLayer.WinchDriverServise
             var result = _mapper.Map<WinchDriverDto>(user);
             return new Response { Model = result, StatusCode = 200, Message = "your data is updated successfully " };
         }
-
-        public Task<Response> CurrentOrder(string userEmail, Enums.OrderBy orderBy)
-        {
-            throw new NotImplementedException();
-        }
+      
     }
 }

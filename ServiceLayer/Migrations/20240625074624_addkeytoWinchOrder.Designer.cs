@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ServiceLayer;
 
@@ -11,9 +12,11 @@ using ServiceLayer;
 namespace ServiceLayer.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240625074624_addkeytoWinchOrder")]
+    partial class addkeytoWinchOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,29 +147,6 @@ namespace ServiceLayer.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("DomainLayer.Models.ApplicationUser_WinchOrder", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("WinchOrderId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("WinchOrderId");
-
-                    b.ToTable("ApplicationUser_WinchOrders");
-                });
-
             modelBuilder.Entity("DomainLayer.Models.Category", b =>
                 {
                     b.Property<string>("Id")
@@ -185,7 +165,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("categories");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Discount", b =>
@@ -199,7 +179,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Discounts");
+                    b.ToTable("discounts");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Photo", b =>
@@ -220,7 +200,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("productID");
 
-                    b.ToTable("Photos");
+                    b.ToTable("photos");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.Product", b =>
@@ -299,7 +279,7 @@ namespace ServiceLayer.Migrations
 
                     b.HasIndex("ShoppingcartId");
 
-                    b.ToTable("Product_Shoppingcarts");
+                    b.ToTable("product_Shoppingcarts");
                 });
 
             modelBuilder.Entity("DomainLayer.Models.RepareOrder", b =>
@@ -463,24 +443,12 @@ namespace ServiceLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ClientName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClientPhoto")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DriverId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProblemDescription")
                         .IsRequired()
@@ -503,6 +471,8 @@ namespace ServiceLayer.Migrations
                     b.HasKey("OrderId");
 
                     b.HasIndex("ClientId");
+
+                    b.HasIndex("DriverId");
 
                     b.HasIndex("WinchDriverId");
 
@@ -657,25 +627,6 @@ namespace ServiceLayer.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DomainLayer.Models.ApplicationUser_WinchOrder", b =>
-                {
-                    b.HasOne("DomainLayer.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("ApplicationUserWinchOrders")
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("DomainLayer.Models.WinchOrder", "WinchOrder")
-                        .WithMany("ApplicationUserWinchOrders")
-                        .HasForeignKey("WinchOrderId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("WinchOrder");
-                });
-
             modelBuilder.Entity("DomainLayer.Models.Photo", b =>
                 {
                     b.HasOne("DomainLayer.Models.Product", "Product")
@@ -771,9 +722,15 @@ namespace ServiceLayer.Migrations
             modelBuilder.Entity("DomainLayer.Models.WinchOrder", b =>
                 {
                     b.HasOne("DomainLayer.Models.ApplicationUser", "Client")
-                        .WithMany()
+                        .WithMany("ClientOrders")
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DomainLayer.Models.ApplicationUser", "Driver")
+                        .WithMany("DriverOrders")
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DomainLayer.Models.WinchDriver", null)
@@ -781,6 +738,8 @@ namespace ServiceLayer.Migrations
                         .HasForeignKey("WinchDriverId");
 
                     b.Navigation("Client");
+
+                    b.Navigation("Driver");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -836,7 +795,9 @@ namespace ServiceLayer.Migrations
 
             modelBuilder.Entity("DomainLayer.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("ApplicationUserWinchOrders");
+                    b.Navigation("ClientOrders");
+
+                    b.Navigation("DriverOrders");
 
                     b.Navigation("Products");
 
@@ -883,11 +844,6 @@ namespace ServiceLayer.Migrations
             modelBuilder.Entity("DomainLayer.Models.WinchDriver", b =>
                 {
                     b.Navigation("Orders");
-                });
-
-            modelBuilder.Entity("DomainLayer.Models.WinchOrder", b =>
-                {
-                    b.Navigation("ApplicationUserWinchOrders");
                 });
 #pragma warning restore 612, 618
         }
