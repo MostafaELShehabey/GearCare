@@ -12,6 +12,9 @@ namespace DomainLayer.Dto
     {
         public string OrderId { get; set; }
 
+        public string cartype { get; set; }
+        public string location { get; set; }
+
         public string ClientId { get; set; }
         public string ServiceProviderId { get; set; }
 

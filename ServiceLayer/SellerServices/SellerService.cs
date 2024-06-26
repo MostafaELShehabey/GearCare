@@ -126,7 +126,7 @@ namespace ServiceLayer.SellerServices
                 return new Response { Message = "Invalid product or seller information." , StatusCode = 404, IsDone = false };
             }
 
-            var category = await _context.Categories.AnyAsync(x => x.Name.ToLower() == productDto.CategoryName.ToLower());
+            var category = await _context.categories.AnyAsync(x => x.Name.ToLower() == productDto.CategoryName.ToLower());
             if(!category)
             {
                 return new Response { IsDone = false , Message = "Category NOT Found !", StatusCode=404};
@@ -158,7 +158,7 @@ namespace ServiceLayer.SellerServices
                 return new Response { Message = "Seller not found", IsDone=false , StatusCode=404};
             }
 
-            if (!await _context.Categories.AnyAsync(c => c.Name.ToLower() == productDto.CategoryName.ToLower()))
+            if (!await _context.categories.AnyAsync(c => c.Name.ToLower() == productDto.CategoryName.ToLower()))
             {
                 return new Response {Message= "Category not found" , StatusCode = 404 , IsDone=false};
             }
@@ -269,7 +269,7 @@ namespace ServiceLayer.SellerServices
             }
 
             var discount = _mapper.Map<Discount>(discountDto);
-            _context.discounts.Add(discount);
+            _context.Discounts.Add(discount);
             await _context.SaveChangesAsync();
             return new Response { IsDone = true , StatusCode=200, Model= discount};
         }
@@ -280,7 +280,7 @@ namespace ServiceLayer.SellerServices
         public async Task<Response> AddDiscountToProduct(string productId, string discountId)
         {
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
-            var discount = await _context.discounts.FindAsync(discountId);
+            var discount = await _context.Discounts.FindAsync(discountId);
 
             if (product == null)
             {
@@ -355,7 +355,8 @@ namespace ServiceLayer.SellerServices
 
             if (products == null || !products.Any())
             {
-                return new Response { Message = "You don’t have any products, Add Some.", IsDone = false, StatusCode = 400 };
+                var Result = new List<ProductOutputDTO>();
+                return new Response {Model =Result, Message = "You don’t have any products, Add Some.", IsDone = false, StatusCode = 400 };
             }
 
            var result = _mapper.Map<List<ProductOutputDTO>>(products);
@@ -394,7 +395,7 @@ namespace ServiceLayer.SellerServices
 
         public Response GetMyDiscounts()
         {
-           var result =  _context.discounts.ToList();
+           var result =  _context.Discounts.ToList();
             if (result.Count == 0)
             {
                 return new Response { Message = "your discount list is impty , Add Discount to Implement "};

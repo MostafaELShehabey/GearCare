@@ -166,7 +166,7 @@ namespace ServiceLayer.Technician
             await _context.SaveChangesAsync();
 
          // var result = _mapper.Map<RepareOrderToAccept>(order);
-            var client =_context.Users.Where(x=>x.Id==order.ClientId);
+            var client = await _context.Users.FirstAsync(x=>x.Id==order.ClientId);
             var result = new RepaireOrderOutDto
             {
                 OrderId = orderId,
@@ -225,7 +225,21 @@ namespace ServiceLayer.Technician
             }
 
             var orders = await query.ToListAsync();
-
+            foreach (var order in orders)
+            {
+                var clientId = order.ClientId;
+                var client = await _context.Users.FirstAsync(x => x.Id == clientId);
+                if (client == null)
+                {
+                    return new Response { Message = $"Invalid or non-existent user ID: {clientId}", StatusCode = 404, IsDone = false };
+                }
+                order.ClientId = client.Id;
+                order.ClientName = client.Name;
+                order.PhoneNumber = client.PhoneNumber;
+                order.ClientPhoto = client.PhotoId;
+                order.location = client.Location;
+                order.cartype = client.CarType;
+            }
             var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
             // var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
 
@@ -233,35 +247,46 @@ namespace ServiceLayer.Technician
             return new Response { StatusCode = 200, Model = result };
         }
 
-        public async Task<Response> CurrentOrder(string userEmail, Enums.OrderBy orderBy)
+        public async Task<Response> CurrentOrder(string userEmail)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
-            if (user == null)
+            //gwt the Service providers 
+            var ServiceProvider = await _context.Users.FirstOrDefaultAsync(x => x.Email == userEmail);
+            if (ServiceProvider == null)
             {
                 return new Response { Message = $"Invalid or non-existent user ID: {userEmail}", StatusCode = 404, IsDone = false };
             }
 
 
-            var query = _context.RepareOrders.Where(x => x.ServiceProviderId == user.Id && (x.Status == (Status.inProgress) || (x.Status == Status.PendingApproval)));
+            var query = _context.RepareOrders.Where(x => x.ServiceProviderId == ServiceProvider.Id && x.Status == Status.inProgress);
+            
 
-            query.Select(x => x.User.applicationUsers);
-            if (orderBy == Enums.OrderBy.status)
-            {
-                query = query.OrderBy(x => x.Status == Status.inProgress)
-                             .ThenBy(x => x.Status == Status.PendingApproval);
-            }
-            else
-            {
-                query = query.OrderBy(x => x.Date);
-            }
-
+          //  query.Select(x => x.User.applicationUsers);
+           
+            query = query.OrderBy(x => x.Date);
+          
             var orders = await query.ToListAsync();
-
+            foreach (var order in orders)
+            {
+                var clientId = order.ClientId;
+                var client = await _context.Users.FirstAsync(x => x.Id == clientId);
+                if(client == null)
+                {
+                    return new Response { Message = $"Invalid or non-existent user ID: {clientId}", StatusCode = 404, IsDone = false };
+                }
+                order.ClientId = client.Id;
+                order.ClientName = client.Name;
+                order.PhoneNumber = client.PhoneNumber;
+                order.ClientPhoto = client.PhotoId;
+                order.location = client.Location;
+                order.cartype = client.CarType;
+            }
             var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
-            // var result = _mapper.Map<List<RepareOrderToAccept>>(orders);
 
-
+            // Return response with mapped DTO list
             return new Response { StatusCode = 200, Model = result };
+
         }
+       
+
     }
 }

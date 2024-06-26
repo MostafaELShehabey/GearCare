@@ -80,13 +80,13 @@ namespace GearCareAPI.Controllers
 
         public async Task<IActionResult> AddCategories(CategoryDto categoryDto)
         {
-            var categoryExist = await _context.Categories.FirstOrDefaultAsync(x => x.Name == categoryDto.Name);
+            var categoryExist = await _context.categories.FirstOrDefaultAsync(x => x.Name == categoryDto.Name);
             if (categoryExist != null)
             {
                 throw new InvalidOperationException("This category already exists!");
             }
             var category = _mapper.Map<Category>(categoryDto);
-            _context.Categories.Add(category);
+            _context.categories.Add(category);
             await _context.SaveChangesAsync();
             return Ok(category);
         }

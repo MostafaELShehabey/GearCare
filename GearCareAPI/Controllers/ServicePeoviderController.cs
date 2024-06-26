@@ -24,26 +24,6 @@ namespace GearCareAPI.Controllers
             _technicianService = technicianService;
         }
 
-        //[HttpPost("AddIDpicture")]
-        //public async Task<IActionResult> AddIDpicture(IFormFile photo)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return BadRequest(ModelState);
-        //        }
-        //        var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        //        var result = await _technicianService.AddIDphoto(photo, userEmail);
-
-        //        return Ok(result);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Internal server error: {ex.Message}");
-        //    }
-        //}
-
 
 
         [HttpPost("CompletePersonalData")]
@@ -115,7 +95,7 @@ namespace GearCareAPI.Controllers
         }
 
         [HttpGet("CurrentOrder")]
-        public async Task<IActionResult> CurrentOrder(Enums.OrderBy orderBy)
+        public async Task<IActionResult> CurrentOrder()
         {
             try
             {
@@ -131,7 +111,7 @@ namespace GearCareAPI.Controllers
                     return Unauthorized(new { Message = "User ID is empty." });
                 }
 
-                var orders = await _technicianService.CurrentOrder(userEmail, orderBy);
+                var orders = await _technicianService.CurrentOrder(userEmail);
                 return Ok(orders);
             }
             catch (Exception ex)

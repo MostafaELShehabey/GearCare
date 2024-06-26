@@ -14,25 +14,29 @@ namespace DomainLayer.Models
     public class WinchOrder
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public string Id { get; set; }
-       
-       // [Range(0,5)]
-       // public int Rate { get; set; }
-        public DateTime Date { get; set; }
-        public Status Status { get; set; }
-     
-        public string DriverId { get; set; }
-        
-        public string ClientId  { get; set; }
-
+        [Key]
+        public string OrderId { get; set; }
         public string cartype { get; set; }
         public string location { get; set; }
         public string ProblemDescription { get; set; }
-        [JsonIgnore]
-        public ApplicationUser Client { get; set; }
-        [JsonIgnore]
-        public ApplicationUser Driver { get; set; }
 
-        
+        public string DriverId { get; set; }
+        public string ClientId { get; set; }
+
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public DateTime Date { get; set; }
+        public Status Status { get; set; }
+
+        public string ClientName { get; set; }
+        public string PhoneNumber { get; set; }
+        public string? ClientPhoto { get; set; }
+
+
+
+        [ForeignKey("ClientId")]
+        public ApplicationUser Client { get; set; }
+       
+        public ICollection<ApplicationUser_WinchOrder> ApplicationUserWinchOrders { get; set; }
+
     }
 }
