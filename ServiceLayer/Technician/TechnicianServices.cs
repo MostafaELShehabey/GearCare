@@ -258,9 +258,6 @@ namespace ServiceLayer.Technician
 
 
             var query = _context.RepareOrders.Where(x => x.ServiceProviderId == ServiceProvider.Id && x.Status == Status.inProgress);
-            
-
-          //  query.Select(x => x.User.applicationUsers);
            
             query = query.OrderBy(x => x.Date);
           

@@ -19,6 +19,9 @@ namespace DomainLayer.Dto
         public string? EMail { get; set; }
         required
         public string Location { get; set; }
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+
         public string? PhotoId { get; set; }//photo
        
         [Range(0, 5)]

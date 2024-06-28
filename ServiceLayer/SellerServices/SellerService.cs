@@ -121,7 +121,7 @@ namespace ServiceLayer.SellerServices
             var seller = _context.Users.First(x=>x.Email==userEmail);
 
             var sellerId = seller.Id.ToString();
-            if (productDto.Name==null || productDto.Price <= 0 || productDto.Description==null || sellerId==null)// Logical Error 
+            if (productDto.Name==null || productDto.Price <= 0 || sellerId==null)// Logical Error 
             {
                 return new Response { Message = "Invalid product or seller information." , StatusCode = 404, IsDone = false };
             }

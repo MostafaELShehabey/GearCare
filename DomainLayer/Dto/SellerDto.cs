@@ -12,6 +12,9 @@ namespace DomainLayer.Dto
         public string Id { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+
         public string? PhotoId { get; set; }
         public UserType UserType { get; set; }
         public int Rate { get; set; }
