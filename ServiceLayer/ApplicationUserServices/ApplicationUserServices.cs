@@ -83,6 +83,8 @@ namespace ServiceLayer.ApplicationUserServices
                         Name = driver.Name,
                         Number = driver.PhoneNumber,
                         Location = driver.Location,
+                        latitude=driver.latitude,
+                        longitude=driver.longitude,
                         Spezilization = driver.Spezilization,
                         winchModel = driver.WinchDriver.Winch.Model
                     })
@@ -228,6 +230,8 @@ namespace ServiceLayer.ApplicationUserServices
                     Id = client.Id,
                     Name = client.Name,
                     Location = client.Location,
+                    latitude=client.latitude,
+                    longitude=client.longitude,
                     PhotoId = client.PhotoId,
                     Available = client.available,
                     Specialization = client.Spezilization,
@@ -239,6 +243,8 @@ namespace ServiceLayer.ApplicationUserServices
                     Id = driver.Id,
                     Name = driver.Name,
                     Location = driver.Location,
+                    latitude = client.latitude,
+                    longitude = client.longitude,
                     PhotoId = driver.PhotoId,
                     Available = driver.available,
                     Specialization = driver.Spezilization,
@@ -290,18 +296,21 @@ namespace ServiceLayer.ApplicationUserServices
                 InStock = p.instock,
                 SellerId = p.SellerId,
                 CategoryName = p.CategoryName != null ? p.CategoryName.ToLower() : null,
-                Seller = p.Seller != null ? new SellerDto
+                Seller = p.Seller != null ?
+                new SellerDto
                 {
                     Id = p.Seller.Id,
                     Name = p.Seller.Name,
                     Location = p.Seller.Location,
+                    longitude=p.Seller.longitude,
+                    latitude=p.Seller.latitude,
                     PhotoId = p.Seller.PhotoId,
                     Available = p.Seller.available,
                     NumberOfRates = p.Seller.NumberOfRates,
                     Rate = p.Seller.Rate,
                     Specialization = p.Seller.Spezilization,
                     UserType = p.Seller.UserType
-                } : null,
+                } :null,
                 Category = p.Categorys,
                 Discount = p.Discount
             }).ToList();

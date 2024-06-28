@@ -17,6 +17,9 @@ namespace DomainLayer.Models
         //Basic data 
         public string Name { get; set; }
         public string Location { get; set; }
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+
         [ForeignKey("userphotoId")]
         public string? PhotoId { get; set; } = null;
         public string? IdPicture { get; set; } = null;

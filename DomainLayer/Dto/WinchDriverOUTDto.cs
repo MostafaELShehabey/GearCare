@@ -13,7 +13,10 @@ namespace DomainLayer.Dto
         public string Number { get; set; }
         
         public string Location { get; set; }
-      
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+
+
         public string winchModel { get; set; }
         public List<string> Spezilization { get; set; }
     }

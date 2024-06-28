@@ -15,10 +15,12 @@ namespace DomainLayer.Dto
         public string Email { get; set; }
 
         public string Location { get; set; }
+        public string latitude { get; set; }
+        public string longitude { get; set; }
 
         // public string CarType { get; set; }
 
-       // public string IdPicture { get; set; }
+        // public string IdPicture { get; set; }
 
         public string Username { get; set; }
 
